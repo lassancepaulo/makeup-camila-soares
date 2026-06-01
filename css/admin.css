@@ -87,14 +87,29 @@ input, select, textarea { font-family: inherit; }
 }
 
 .sidebar-logo {
-  padding: 24px 24px 18px;
+  padding: 20px 24px 16px;
   border-bottom: 1px solid rgba(255,255,255,.07);
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 5px;
 }
 
-/* Iniciais circulares no estilo da logo */
+.sidebar-logo-img {
+  max-height: 64px;
+  width: auto;
+  max-width: 180px;
+  object-fit: contain;
+  display: block;
+}
+
+.sidebar-logo-admin {
+  font-size: .58rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,.45);
+}
+
+/* Iniciais circulares no estilo da logo (mantido por compatibilidade) */
 .sidebar-logo-mark {
   width: 42px;
   height: 42px;
