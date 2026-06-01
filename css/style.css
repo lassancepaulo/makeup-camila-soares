@@ -162,7 +162,7 @@ section { padding: 100px 0; }
 
 /* Ambas as logos têm a mesma altura — proporcional e sem salto na transição */
 .nav-logo-img {
-  height: 64px;
+  height: 128px;
   width: auto;
   display: block;
   transition: opacity .35s ease;
