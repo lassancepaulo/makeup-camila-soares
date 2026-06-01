@@ -1,0 +1,226 @@
+/* ============================================================
+   MAKEUP CAMILA SOARES — Site Config (público)
+   Lê localStorage['camilaSiteConfig'] e aplica ao DOM.
+   Carregado ANTES de main.js para que os dados sejam aplicados
+   logo que o DOM estiver pronto.
+   ============================================================ */
+
+const SITE_CONFIG_KEY = 'camilaSiteConfig';
+
+// Configuração padrão (valores usados quando não há config salva)
+const SITE_CONFIG_DEFAULT = {
+  hero: {
+    tagline:      '✦ Beleza que transforma ✦',
+    title:        'Camila',
+    titleItalic:  'Soares',
+    subtitle:     'Makeup Artist Profissional',
+    desc:         'Criando experiências únicas de beleza para os momentos mais especiais da sua vida',
+    ctaPrimary:   'Agende sua consultoria',
+    ctaSecondary: 'Ver portfólio',
+    bgImage:      ''
+  },
+  sobre: {
+    photo: '',
+    text1: 'Com mais de 8 anos de experiência, Camila Soares se especializou em transformar beleza natural em arte. Formada pelos melhores cursos do Brasil, com certificações internacionais, cada trabalho é uma expressão única de talento e dedicação.',
+    text2: 'Seja para o seu casamento, formatura ou evento especial, Camila garante que você se sinta deslumbrante e confiante. Produtos premium e técnicas modernas para uma make que dura o dia todo.'
+  },
+  servicos: {
+    noiva:     { title: 'Noiva',              desc: 'Atendimento exclusivo e completo para o dia mais especial.' },
+    madrinhas: { title: 'Madrinhas',           desc: 'Pacote especial para o grupo de madrinhas.' },
+    formatura: { title: 'Formatura',           desc: 'Make sofisticada para eternizar seu momento de conquista.' },
+    ensaio:    { title: 'Ensaio Fotográfico',  desc: 'Make artística e editorial para ensaios e campanhas.' },
+    evento:    { title: 'Eventos Sociais',     desc: 'Make impecável para festas, aniversários e celebrações.' },
+    aula:      { title: 'Aulas Particulares',  desc: 'Aprenda técnicas profissionais em aulas personalizadas.' }
+  },
+  contato: {
+    whatsapp:  '5511999999999',
+    instagram: 'makeupcamilasoares',
+    email:     'contato@makeupcamilasoares.com',
+    endereco:  'Domicílio e estúdio próprio'
+  },
+  depoimentos: [],   // vazio = usa os do HTML
+  portfolio: {
+    beholdFeedId: ''  // ID do feed Behold.so (vazio = usa portfólio estático)
+  }
+};
+
+/* ---- Leitura ---- */
+function getSiteConfig() {
+  try {
+    const raw = localStorage.getItem(SITE_CONFIG_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) {
+    return null;
+  }
+}
+
+/* ---- Merge profundo config salva com defaults ---- */
+function getMergedConfig() {
+  const saved = getSiteConfig();
+  if (!saved) return SITE_CONFIG_DEFAULT;
+  // Merge superficial por seção
+  return {
+    hero:        Object.assign({}, SITE_CONFIG_DEFAULT.hero,        saved.hero        || {}),
+    sobre:       Object.assign({}, SITE_CONFIG_DEFAULT.sobre,       saved.sobre       || {}),
+    servicos:    Object.assign({}, SITE_CONFIG_DEFAULT.servicos,    saved.servicos    || {}),
+    contato:     Object.assign({}, SITE_CONFIG_DEFAULT.contato,     saved.contato     || {}),
+    depoimentos: saved.depoimentos && saved.depoimentos.length ? saved.depoimentos : [],
+    portfolio:   Object.assign({}, SITE_CONFIG_DEFAULT.portfolio,   saved.portfolio   || {})
+  };
+}
+
+/* ---- Aplicação ao DOM ---- */
+function applySiteConfig() {
+  const cfg = getMergedConfig();
+
+  // ---- HERO ----
+  _setText('.hero-tagline',   cfg.hero.tagline);
+  _setText('.hero-subtitle',  cfg.hero.subtitle);
+  _setText('.hero-desc',      cfg.hero.desc);
+
+  const heroTitle = document.querySelector('.hero-title');
+  if (heroTitle && cfg.hero.title) {
+    heroTitle.innerHTML = cfg.hero.title + ' <em>' + cfg.hero.titleItalic + '</em>';
+  }
+
+  const heroBtns = document.querySelectorAll('.hero-buttons .btn');
+  if (heroBtns[0] && cfg.hero.ctaPrimary)   heroBtns[0].textContent = cfg.hero.ctaPrimary;
+  if (heroBtns[1] && cfg.hero.ctaSecondary) heroBtns[1].textContent = cfg.hero.ctaSecondary;
+
+  if (cfg.hero.bgImage) {
+    const heroBg = document.querySelector('.hero-bg');
+    if (heroBg) heroBg.style.backgroundImage = 'url(' + cfg.hero.bgImage + ')';
+  }
+
+  // ---- SOBRE ----
+  if (cfg.sobre.photo) {
+    const sobreImg = document.querySelector('.sobre-img-frame img, .sobre-img-placeholder');
+    if (sobreImg) {
+      if (sobreImg.tagName === 'IMG') {
+        sobreImg.src = cfg.sobre.photo;
+      } else {
+        // placeholder → substituir por img
+        const img = document.createElement('img');
+        img.src = cfg.sobre.photo;
+        img.alt = 'Camila Soares';
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:inherit';
+        sobreImg.replaceWith(img);
+      }
+    }
+  }
+
+  const sobreTexts = document.querySelectorAll('.sobre-text p');
+  if (sobreTexts[0] && cfg.sobre.text1) sobreTexts[0].textContent = cfg.sobre.text1;
+  if (sobreTexts[1] && cfg.sobre.text2) sobreTexts[1].textContent = cfg.sobre.text2;
+
+  // ---- CONTATO ----
+  const wppNum = cfg.contato.whatsapp.replace(/\D/g, '');
+  const igHandle = cfg.contato.instagram.replace('@', '');
+  const wppMsg = encodeURIComponent('Olá Camila! Gostaria de solicitar um orçamento.');
+
+  // Atualiza todos os links WhatsApp
+  document.querySelectorAll('a[href*="wa.me"]').forEach(function(a) {
+    a.href = 'https://wa.me/' + wppNum + '?text=' + wppMsg;
+  });
+
+  // Botão de orçamento da seção de serviços
+  const wppServBtn = document.getElementById('servicos-wpp-btn');
+  if (wppServBtn) {
+    wppServBtn.href = 'https://wa.me/' + wppNum +
+      '?text=' + encodeURIComponent('Olá Camila! Gostaria de solicitar um orçamento para maquiagem.');
+  }
+
+  // Link e handle do Instagram
+  const igLink = document.getElementById('instagram-link');
+  if (igLink) igLink.href = 'https://instagram.com/' + igHandle;
+  _setText('#instagram-handle', '@' + igHandle);
+
+  // Email
+  document.querySelectorAll('a[href^="mailto:"]').forEach(function(a) {
+    a.href = 'mailto:' + cfg.contato.email;
+    if (a.textContent.includes('@')) a.textContent = cfg.contato.email;
+  });
+
+  // Textos de contato visíveis
+  document.querySelectorAll('.contato-item.whatsapp .contato-value, .contato-value-phone').forEach(function(el) {
+    el.textContent = _formatPhone(wppNum);
+  });
+  document.querySelectorAll('.contato-item.instagram .contato-value, .contato-value-ig').forEach(function(el) {
+    el.textContent = '@' + igHandle;
+  });
+
+  // ---- DEPOIMENTOS ----
+  if (cfg.depoimentos && cfg.depoimentos.length > 0) {
+    const track = document.getElementById('depoimentosTrack');
+    if (track) {
+      track.innerHTML = cfg.depoimentos.map(function(d) {
+        const stars = '<i class="fas fa-star"></i>'.repeat(d.stars || 5);
+        return '<div class="depoimento-card">'
+          + '<div class="stars">' + stars + '</div>'
+          + '<p>"' + _escHtml(d.text) + '"</p>'
+          + '<div class="depoimento-autor">'
+          + '<div class="autor-avatar"><i class="fas fa-user"></i></div>'
+          + '<div><strong>' + _escHtml(d.name) + '</strong><span>' + _escHtml(d.date || '') + '</span></div>'
+          + '</div></div>';
+      }).join('');
+    }
+  }
+
+  // ---- PORTFOLIO / BEHOLD ----
+  const feedId = cfg.portfolio && cfg.portfolio.beholdFeedId;
+  if (feedId) {
+    // Mostra container do feed e oculta o grid estático
+    const beholdContainer = document.getElementById('behold-feed-container');
+    const portfolioGrid   = document.getElementById('portfolioGrid');
+    const portfolioFilter = document.querySelector('.portfolio-filter');
+
+    if (beholdContainer) beholdContainer.style.display = 'block';
+    if (portfolioGrid)   portfolioGrid.style.display   = 'none';
+    if (portfolioFilter) portfolioFilter.style.display = 'none';
+
+    // Injeta widget Behold.so
+    const inner = document.getElementById('behold-feed-inner');
+    if (inner && !document.getElementById('behold-widget-' + feedId)) {
+      inner.innerHTML = '<div id="behold-widget-' + feedId + '"></div>';
+      window.beholdWidgets = window.beholdWidgets || [];
+      window.beholdWidgets.push({
+        id: feedId,
+        theme: 'light',
+        columns: 3,
+        rows: 2,
+        gap: 12
+      });
+      const s = document.createElement('script');
+      s.defer = true;
+      s.src   = 'https://cdn.behold.so/widget.js';
+      document.body.appendChild(s);
+    }
+  }
+}
+
+/* ---- Helpers ---- */
+function _setText(sel, val) {
+  if (!val) return;
+  const el = document.querySelector(sel);
+  if (el) el.textContent = val;
+}
+
+function _escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function _formatPhone(num) {
+  // Formata 5511999999999 → (11) 99999-9999
+  const n = num.replace(/\D/g,'').replace(/^55/,'');
+  if (n.length === 11) return '(' + n.slice(0,2) + ') ' + n.slice(2,7) + '-' + n.slice(7);
+  if (n.length === 10) return '(' + n.slice(0,2) + ') ' + n.slice(2,6) + '-' + n.slice(6);
+  return num;
+}
+
+// Aplica assim que o DOM estiver pronto
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', applySiteConfig);
+} else {
+  applySiteConfig();
+}

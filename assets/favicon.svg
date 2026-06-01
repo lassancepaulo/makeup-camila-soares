@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F07272"/>
+      <stop offset="100%" stop-color="#D85A5A"/>
+    </linearGradient>
+  </defs>
+  <rect width="60" height="60" rx="13" fill="url(#g)"/>
+  <text x="30" y="42"
+    font-family="Georgia,'Times New Roman',serif"
+    font-size="30"
+    font-style="italic"
+    font-weight="bold"
+    fill="white"
+    text-anchor="middle">cS</text>
+</svg>

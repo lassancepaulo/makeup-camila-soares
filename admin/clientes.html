@@ -1,0 +1,415 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clientes — Admin Camila Soares</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="../assets/favicon.svg" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+</head>
+<body>
+<div class="admin-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-mark">cS</div>
+      <div class="sidebar-logo-text">
+        <span class="logo-text">Makeup <em>Camila</em></span>
+        <span class="logo-sub">Painel Administrativo</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Principal</div>
+      <a href="index.html"          class="sidebar-link"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="agenda.html"         class="sidebar-link"><i class="fas fa-calendar-week"></i> Agenda</a>
+      <a href="agendamentos.html"   class="sidebar-link"><i class="fas fa-calendar-check"></i> Agendamentos</a>
+      <a href="clientes.html"       class="sidebar-link active"><i class="fas fa-address-book"></i> Clientes</a>
+      <a href="orcamentos.html"     class="sidebar-link"><i class="fas fa-file-invoice"></i> Orçamentos</a>
+      <a href="orcamento-novo.html" class="sidebar-link"><i class="fas fa-plus-circle"></i> Novo Orçamento</a>
+      <a href="pipeline.html"       class="sidebar-link"><i class="fas fa-project-diagram"></i> Pipeline</a>
+      <div class="nav-section-title" style="margin-top:8px">Financeiro</div>
+      <a href="faturamento.html"    class="sidebar-link"><i class="fas fa-chart-bar"></i> Faturamento</a>
+      <div class="nav-section-title" style="margin-top:8px">Operacional</div>
+      <a href="estoque.html"        class="sidebar-link"><i class="fas fa-boxes"></i> Estoque <span id="estoqueBadge" class="sidebar-badge" style="display:none"></span></a>
+      <div class="nav-section-title" style="margin-top:8px">Site</div>
+      <a href="site-editor.html"    class="sidebar-link"><i class="fas fa-paint-brush"></i> Editor do Site</a>
+      <a href="../index.html"       class="sidebar-link" target="_blank"><i class="fas fa-external-link-alt"></i> Ver site</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar"><i class="fas fa-user"></i></div>
+        <div class="sidebar-user-info">
+          <strong>Camila Soares</strong>
+          <span>Administradora</span>
+        </div>
+      </div>
+      <button class="sidebar-logout" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Sair
+      </button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <header class="admin-header">
+      <div class="header-left">
+        <span class="header-title">Clientes</span>
+        <span class="header-breadcrumb">CRM · Leads · Histórico de atendimentos</span>
+      </div>
+      <div class="header-actions">
+        <input type="text" id="searchClients" placeholder="🔍 Buscar por nome ou telefone..."
+          style="padding:9px 16px;border:1px solid rgba(0,0,0,.1);border-radius:10px;font-size:.82rem;font-family:inherit;min-width:260px" />
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- Stats -->
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px">
+        <div class="stat-card">
+          <div class="stat-card-header"><div class="stat-card-icon rose"><i class="fas fa-users"></i></div></div>
+          <div class="stat-card-value" id="cStatTotal">0</div>
+          <div class="stat-card-label">Total de clientes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-header"><div class="stat-card-icon amber"><i class="fas fa-user-clock"></i></div></div>
+          <div class="stat-card-value" id="cStatLeads">0</div>
+          <div class="stat-card-label">Leads (sem agendamento)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-header"><div class="stat-card-icon green"><i class="fas fa-redo"></i></div></div>
+          <div class="stat-card-value" id="cStatRetorno">0</div>
+          <div class="stat-card-label">Clientes recorrentes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-header"><div class="stat-card-icon blue"><i class="fas fa-share-alt"></i></div></div>
+          <div class="stat-card-value" id="cStatSite">0</div>
+          <div class="stat-card-label">Vindos pelo site</div>
+        </div>
+      </div>
+
+      <!-- Clients table -->
+      <div class="content-card">
+        <div class="card-header">
+          <h3 class="card-title">Base de Clientes</h3>
+          <span class="card-action" id="clientCount">0 clientes</span>
+        </div>
+        <div id="clientsContainer">
+          <div class="empty-state"><i class="fas fa-address-book"></i><p>Nenhum cliente ainda</p></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ===== MODAL: GERADOR DE MENSAGEM WHATSAPP ===== -->
+<div class="modal-overlay" id="clientWAModal">
+  <div class="modal" style="max-width:560px">
+    <h3><i class="fab fa-whatsapp" style="color:#25D366;margin-right:8px"></i> Mensagem para <span id="clientWAName"></span></h3>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      <button class="tab-wa active" data-tpl="orcamento"   onclick="selectWATpl(this,'orcamento')">   <i class="fas fa-file-invoice"></i> Orçamento</button>
+      <button class="tab-wa"        data-tpl="followup"    onclick="selectWATpl(this,'followup')">    <i class="fas fa-bell"></i> Follow-up</button>
+      <button class="tab-wa"        data-tpl="aniversario" onclick="selectWATpl(this,'aniversario')"> <i class="fas fa-birthday-cake"></i> Aniversário</button>
+      <button class="tab-wa"        data-tpl="indicacao"   onclick="selectWATpl(this,'indicacao')">   <i class="fas fa-heart"></i> Indicação</button>
+    </div>
+
+    <textarea id="clientWAMsg" rows="10"
+      style="width:100%;padding:14px;border:1px solid rgba(0,0,0,.12);border-radius:12px;font-size:.83rem;font-family:inherit;line-height:1.7;resize:vertical;box-sizing:border-box;background:#f9faf8"></textarea>
+
+    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+      <a id="clientWASend" href="#" target="_blank"
+         style="padding:10px 20px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border-radius:10px;text-decoration:none;font-weight:600;font-size:.85rem;display:inline-flex;align-items:center;gap:8px">
+        <i class="fab fa-whatsapp"></i> Abrir WhatsApp
+      </a>
+      <button onclick="copyClientWAMsg()" class="btn-secondary-admin">
+        <i class="fas fa-copy"></i> Copiar
+      </button>
+      <button onclick="document.getElementById('clientWAModal').classList.remove('open')" class="btn-secondary-admin" style="margin-left:auto">
+        Fechar
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+.tab-wa {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,.1);
+  background: #fff;
+  font-size: .8rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex; align-items: center; gap: 6px;
+  transition: .2s;
+}
+.tab-wa.active { background: #25D366; color: #fff; border-color: #25D366; }
+.tab-wa:hover:not(.active) { border-color: #25D366; color: #25D366; }
+</style>
+
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle"></i>
+  <span id="toastMsg">Ação concluída!</span>
+</div>
+
+<script src="../js/services-config.js"></script>
+<script src="../js/admin.js"></script>
+<script>
+requireAuth();
+initEstoqueBadge();
+
+// ── WhatsApp modal ─────────────────────────────────────
+let _waClient = null;
+let _waTpl    = 'orcamento';
+
+const _CLIENT_TEMPLATES = {
+  orcamento: (c) =>
+    `Olá ${c.name}! 🌸\n\n`
+    + `Tudo bem? Sou a Camila Soares, Makeup Artist! 💄\n\n`
+    + `Recebi sua solicitação e adoraria fazer parte do seu dia especial.\n\n`
+    + `Me conta um pouco mais sobre o evento: qual é a data, o tipo de serviço e o local? `
+    + `Assim preparo um orçamento personalizado para você! 💕\n\n`
+    + `_Camila Soares Makeup Artist_`,
+
+  followup: (c) =>
+    `Olá ${c.name}! 💕\n\n`
+    + `Passando para dar um oi e saber se ainda tem interesse em um atendimento! 😊\n\n`
+    + `Tenho datas disponíveis e adoraria te atender. Quando é o seu evento?\n\n`
+    + `Qualquer dúvida, estou aqui! 🌸\n`
+    + `_Camila Soares Makeup Artist_`,
+
+  aniversario: (c) =>
+    `🎂 Feliz Aniversário, ${c.name}! 🎉\n\n`
+    + `Desejando um dia especial cheio de alegria e beleza! ✨\n\n`
+    + `Como presente especial, tenho uma condição exclusiva para você esse mês. `
+    + `Quer saber mais? Me chama aqui! 💄🌸\n\n`
+    + `Com carinho,\n_Camila Soares Makeup Artist_`,
+
+  indicacao: (c) =>
+    `Olá ${c.name}! 🌸\n\n`
+    + `Fico muito feliz que tenha lembrado de mim e indicado para alguém especial! 💕\n\n`
+    + `Como agradecimento pela indicação, na sua próxima maquiagem você ganha um desconto especial. 🎁\n\n`
+    + `Obrigada de coração! 💄\n`
+    + `_Camila Soares Makeup Artist_`
+};
+
+function openClientWAByIdx(idx) {
+  openClientWAObj(_clientsCache[idx] || {});
+}
+
+function openClientWA(jsonStr) {
+  try { openClientWAObj(JSON.parse(jsonStr)); }
+  catch { openClientWAObj({}); }
+}
+
+function openClientWAObj(c) {
+  _waClient = c;
+  _waTpl = 'orcamento';
+
+  document.getElementById('clientWAName').textContent = _waClient.name || '';
+  document.querySelectorAll('.tab-wa').forEach(b => b.classList.remove('active'));
+  document.querySelector('.tab-wa[data-tpl="orcamento"]')?.classList.add('active');
+
+  _renderWAMsg();
+  document.getElementById('clientWAModal').classList.add('open');
+}
+
+function selectWATpl(btn, tpl) {
+  _waTpl = tpl;
+  document.querySelectorAll('.tab-wa').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  _renderWAMsg();
+}
+
+function _renderWAMsg() {
+  if (!_waClient) return;
+  const msg = _CLIENT_TEMPLATES[_waTpl]
+    ? _CLIENT_TEMPLATES[_waTpl](_waClient)
+    : '';
+  document.getElementById('clientWAMsg').value = msg;
+  const phone = (_waClient.phone || '').replace(/\D/g, '');
+  const link  = document.getElementById('clientWASend');
+  if (link) link.href = phone
+    ? `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
+    : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+}
+
+function copyClientWAMsg() {
+  const txt = document.getElementById('clientWAMsg')?.value;
+  if (txt) navigator.clipboard?.writeText(txt).then(() => showToast('Copiado!'));
+}
+
+// Sync textarea edits to send link
+document.getElementById('clientWAMsg')?.addEventListener('input', function() {
+  const phone = (_waClient?.phone || '').replace(/\D/g, '');
+  const link  = document.getElementById('clientWASend');
+  if (link) link.href = phone
+    ? `https://wa.me/${phone}?text=${encodeURIComponent(this.value)}`
+    : `https://wa.me/?text=${encodeURIComponent(this.value)}`;
+});
+
+
+const SOURCE_LABELS = {
+  site:      'Site',
+  orcamento: 'Orçamento',
+  instagram: 'Instagram',
+  indicacao: 'Indicação',
+  whatsapp:  'WhatsApp',
+  outros:    'Outros'
+};
+
+function loadClientesPage() {
+  // Build client list from bookings + quotes if no dedicated client store
+  const bookings = getAllBookings();
+  const quotes   = getAll();
+  const DS_KEY   = 'camilaClientes';
+
+  // Auto-populate from bookings/quotes if store is empty
+  let clients = [];
+  try { clients = JSON.parse(localStorage.getItem(DS_KEY) || '[]'); } catch { clients = []; }
+
+  if (clients.length === 0) {
+    const seen = new Set();
+    bookings.forEach(b => {
+      const key = (b.clientPhone || '').replace(/\D/g,'');
+      if (!seen.has(key) && key) {
+        seen.add(key);
+        clients.push({
+          id:           `CLI-${key}`,
+          name:         b.clientName,
+          phone:        b.clientPhone,
+          email:        b.clientEmail || '',
+          source:       'site',
+          bookingCount: bookings.filter(x => (x.clientPhone||'').replace(/\D/g,'') === key).length,
+          quoteCount:   0,
+          lastBookingId: b.id,
+          createdAt:    b.createdAt
+        });
+      }
+    });
+    quotes.forEach(q => {
+      const key = (q.clientPhone || '').replace(/\D/g,'');
+      if (!seen.has(key) && key) {
+        seen.add(key);
+        clients.push({
+          id:           `CLI-${key}`,
+          name:         q.clientName,
+          phone:        q.clientPhone,
+          email:        q.clientEmail || '',
+          source:       'orcamento',
+          bookingCount: 0,
+          quoteCount:   quotes.filter(x => (x.clientPhone||'').replace(/\D/g,'') === key).length,
+          createdAt:    q.createdAt
+        });
+      }
+    });
+    if (clients.length) localStorage.setItem(DS_KEY, JSON.stringify(clients));
+  }
+
+  renderClientStats(clients);
+  renderClientsTable(clients);
+
+  document.getElementById('searchClients').addEventListener('input', () => {
+    const q = document.getElementById('searchClients').value.toLowerCase();
+    renderClientsTable(clients.filter(c =>
+      c.name.toLowerCase().includes(q) || (c.phone || '').includes(q)
+    ));
+  });
+}
+
+function renderClientStats(clients) {
+  setText('cStatTotal',  clients.length);
+  setText('cStatLeads',  clients.filter(c => !c.bookingCount && !c.quoteCount).length);
+  setText('cStatRetorno',clients.filter(c => (c.bookingCount || 0) > 1).length);
+  setText('cStatSite',   clients.filter(c => c.source === 'site').length);
+}
+
+let _clientsCache = [];
+
+function renderClientsTable(clients) {
+  _clientsCache = clients;
+  const container = document.getElementById('clientsContainer');
+  setText('clientCount', `${clients.length} cliente${clients.length !== 1 ? 's' : ''}`);
+
+  if (!clients.length) {
+    container.innerHTML = `<div class="empty-state"><i class="fas fa-address-book"></i><p>Nenhum cliente encontrado</p></div>`;
+    return;
+  }
+
+  const rows = clients.map(c => {
+    const bookings = getAllBookings().filter(b =>
+      (b.clientPhone || '').replace(/\D/g,'') === (c.phone || '').replace(/\D/g,'')
+    );
+    const totalSpent = bookings
+      .filter(b => ['entrada_paga','concluido'].includes(b.status))
+      .reduce((s, b) => s + (b.status === 'concluido' ? (b.totalValue||0) : (b.depositValue||0)), 0);
+
+    const lastEvt = bookings.sort((a,b)=>new Date(b.eventDate)-new Date(a.eventDate))[0];
+    const lastDate = lastEvt ? formatDate(lastEvt.eventDate) : '—';
+    const srcLabel = SOURCE_LABELS[c.source] || c.source;
+
+    return `<tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--gradient);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <i class="fas fa-user" style="color:#fff;font-size:.8rem"></i>
+          </div>
+          <div>
+            <div style="font-weight:600;font-size:.9rem">${c.name}</div>
+            ${c.email ? `<div style="font-size:.75rem;color:var(--text-light)">${c.email}</div>` : ''}
+          </div>
+        </div>
+      </td>
+      <td>
+        <a href="https://wa.me/${(c.phone||'').replace(/\D/g,'')}" target="_blank"
+           style="color:var(--rose-gold);text-decoration:none;font-weight:500">
+          <i class="fab fa-whatsapp"></i> ${c.phone || '—'}
+        </a>
+      </td>
+      <td><span style="font-size:.78rem;background:#f5f0ec;padding:3px 10px;border-radius:20px;color:var(--text-light)">${srcLabel}</span></td>
+      <td style="text-align:center;font-weight:600">${c.bookingCount || 0}</td>
+      <td style="font-weight:700;color:#059669">${totalSpent > 0 ? formatMoney(totalSpent) : '—'}</td>
+      <td style="color:var(--text-light);font-size:.82rem">${lastDate}</td>
+      <td>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <a href="https://wa.me/${(c.phone||'').replace(/\D/g,'')}" target="_blank"
+             class="btn-secondary-admin" style="padding:6px 12px;font-size:.78rem;text-decoration:none">
+            <i class="fab fa-whatsapp"></i>
+          </a>
+          <button onclick="openClientWAByIdx(${clients.indexOf(c)})"
+             class="btn-secondary-admin" style="padding:6px 12px;font-size:.78rem">
+            <i class="fas fa-comment-dots"></i> Mensagem
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  container.innerHTML = `
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>WhatsApp</th>
+          <th>Origem</th>
+          <th style="text-align:center">Agendamentos</th>
+          <th>Total gasto</th>
+          <th>Último evento</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+loadClientesPage();
+</script>
+</body>
+</html>

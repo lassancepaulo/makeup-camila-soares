@@ -1,0 +1,12 @@
+{
+  "name": "makeup-camila-soares",
+  "version": "1.0.0",
+  "description": "Site institucional e painel administrativo — Makeup Camila Soares",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

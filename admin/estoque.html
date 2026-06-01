@@ -1,0 +1,418 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estoque — Admin Camila Soares</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="../assets/favicon.svg" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <style>
+    /* ── KPI CARDS ── */
+    .est-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 600px) { .est-kpi-row { grid-template-columns: 1fr; } }
+    .est-kpi-card {
+      background: var(--white);
+      border-radius: var(--radius-sm);
+      padding: 16px 18px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(0,0,0,.04);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .est-kpi-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .95rem;
+      flex-shrink: 0;
+    }
+    .est-kpi-icon.blue   { background: #DBEAFE; color: #2563EB; }
+    .est-kpi-icon.amber  { background: #FEF3C7; color: #D97706; }
+    .est-kpi-icon.red    { background: #FEE2E2; color: #DC2626; }
+    .est-kpi-label { font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--text-light); }
+    .est-kpi-value { font-size: 1.3rem; font-weight: 700; color: var(--dark-soft); margin-top: 2px; }
+
+    /* ── FILTERS ── */
+    .est-filter-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .est-filter-input {
+      padding: 8px 12px;
+      border: 1px solid rgba(0,0,0,.1);
+      border-radius: 8px;
+      font-size: .82rem;
+      font-family: inherit;
+      background: var(--white);
+    }
+    .est-filter-input:focus { outline: none; border-color: var(--rose-gold); }
+    .est-search { min-width: 200px; flex: 1; }
+    .est-check-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .8rem;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      padding: 8px 12px;
+      background: var(--white);
+      border: 1px solid rgba(0,0,0,.1);
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+    .est-check-label input { accent-color: var(--rose-gold-dark); }
+
+    /* ── TABLE ── */
+    .est-table-wrap { overflow-x: auto; }
+    .est-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .83rem;
+    }
+    .est-table th {
+      text-align: left;
+      padding: 10px 12px;
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--text-light);
+      border-bottom: 2px solid rgba(0,0,0,.07);
+      white-space: nowrap;
+    }
+    .est-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(0,0,0,.05);
+      vertical-align: middle;
+    }
+    .est-table tr:hover td { background: #FAFAFA; }
+    .est-table tr.row-low td { background: #FFFBEB; }
+    .est-table tr.row-out td { background: #FEF2F2; }
+
+    .est-item-name  { font-weight: 600; color: var(--dark-soft); }
+    .est-item-brand { font-size: .72rem; color: var(--text-light); }
+    .est-cat-badge  {
+      background: var(--cream);
+      color: var(--rose-gold-dark);
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: .7rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .est-qty-ctrl {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+    }
+    .est-qty-ctrl button {
+      width: 24px; height: 24px;
+      border-radius: 6px;
+      border: 1px solid rgba(0,0,0,.12);
+      background: var(--white);
+      font-size: .9rem;
+      line-height: 1;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+    }
+    .est-qty-ctrl button:hover { background: var(--cream); }
+    .est-qty-ctrl span { min-width: 28px; text-align: center; font-weight: 700; font-size: .9rem; }
+    .qty-zero { color: #DC2626 !important; }
+    .qty-low  { color: #D97706 !important; }
+    .est-unit { font-size: .68rem; color: var(--text-light); text-align: center; margin-top: 2px; }
+    .est-min  { font-size: .8rem; color: var(--text-light); }
+    .est-date { font-size: .75rem; color: var(--text-light); }
+
+    .est-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: .72rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .est-badge-ok  { background: #D1FAE5; color: #065F46; }
+    .est-badge-low { background: #FEF3C7; color: #92400E; }
+    .est-badge-out { background: #FEE2E2; color: #7F1D1D; }
+
+    .btn-tbl {
+      background: #F5F3F0;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 8px;
+      font-size: .75rem;
+      cursor: pointer;
+      color: var(--text-light);
+      margin-right: 3px;
+      transition: background .15s;
+    }
+    .btn-tbl:hover     { background: var(--cream); color: var(--dark-soft); }
+    .btn-tbl-del:hover { background: #FEE2E2; color: #DC2626; }
+
+    .estoque-empty {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-light);
+      font-size: .85rem;
+    }
+    .estoque-empty i { font-size: 2rem; display: block; margin-bottom: 10px; }
+
+    /* ── MODAL ── */
+    #estoqueModal {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .est-modal-box {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 28px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: var(--shadow-md);
+    }
+    .est-modal-box h3 {
+      font-family: var(--font-serif);
+      font-size: 1.1rem;
+      color: var(--dark-soft);
+      margin-bottom: 20px;
+    }
+    .est-field { margin-bottom: 14px; }
+    .est-label { font-size: .73rem; font-weight: 600; color: var(--text-light); margin-bottom: 5px; display: block; text-transform: uppercase; letter-spacing: .4px; }
+    .est-input {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid rgba(0,0,0,.12);
+      border-radius: 8px;
+      font-size: .85rem;
+      font-family: inherit;
+      background: var(--white);
+    }
+    .est-input:focus { outline: none; border-color: var(--rose-gold); }
+    .est-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .est-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .est-modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+    .est-btn-save {
+      background: var(--gradient);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 22px;
+      font-size: .85rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .est-btn-cancel {
+      background: none;
+      border: 1px solid rgba(0,0,0,.12);
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-size: .85rem;
+      font-family: inherit;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-wrapper">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-mark">cS</div>
+        <div class="sidebar-logo-text">
+          <span class="logo-text">Makeup <em>Camila</em></span>
+          <span class="logo-sub">Painel Administrativo</span>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Principal</div>
+        <a href="index.html"          class="sidebar-link"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="agenda.html"         class="sidebar-link"><i class="fas fa-calendar-week"></i> Agenda</a>
+        <a href="agendamentos.html"   class="sidebar-link"><i class="fas fa-calendar-check"></i> Agendamentos</a>
+        <a href="clientes.html"       class="sidebar-link"><i class="fas fa-address-book"></i> Clientes</a>
+        <a href="orcamentos.html"     class="sidebar-link"><i class="fas fa-file-invoice"></i> Orçamentos</a>
+        <a href="orcamento-novo.html" class="sidebar-link"><i class="fas fa-plus-circle"></i> Novo Orçamento</a>
+        <a href="pipeline.html"       class="sidebar-link"><i class="fas fa-project-diagram"></i> Pipeline</a>
+        <div class="nav-section-title" style="margin-top:8px">Financeiro</div>
+        <a href="faturamento.html"    class="sidebar-link"><i class="fas fa-chart-bar"></i> Faturamento</a>
+        <div class="nav-section-title" style="margin-top:8px">Operacional</div>
+        <a href="estoque.html"        class="sidebar-link active"><i class="fas fa-boxes"></i> Estoque <span id="estoqueBadge" class="sidebar-badge" style="display:none"></span></a>
+        <div class="nav-section-title" style="margin-top:8px">Site</div>
+        <a href="site-editor.html"    class="sidebar-link"><i class="fas fa-paint-brush"></i> Editor do Site</a>
+        <a href="../index.html"       class="sidebar-link" target="_blank"><i class="fas fa-external-link-alt"></i> Ver site</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="sidebar-avatar"><i class="fas fa-user"></i></div>
+          <div class="sidebar-user-info"><strong>Camila Soares</strong><span>Administradora</span></div>
+        </div>
+        <button class="sidebar-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <header class="admin-header">
+        <div class="header-left">
+          <span class="header-title">Estoque</span>
+          <span class="header-breadcrumb">Controle de produtos e materiais</span>
+        </div>
+        <div class="header-actions">
+          <button class="btn-header btn-header-primary" onclick="openNewEstoque()">
+            <i class="fas fa-plus"></i> Novo Produto
+          </button>
+        </div>
+      </header>
+
+      <div class="page-content">
+
+        <!-- KPIs -->
+        <div class="est-kpi-row">
+          <div class="est-kpi-card">
+            <div class="est-kpi-icon blue"><i class="fas fa-boxes"></i></div>
+            <div>
+              <div class="est-kpi-label">Total de Produtos</div>
+              <div class="est-kpi-value" id="estoqueTotal">0</div>
+            </div>
+          </div>
+          <div class="est-kpi-card">
+            <div class="est-kpi-icon amber"><i class="fas fa-exclamation-circle"></i></div>
+            <div>
+              <div class="est-kpi-label">Repor em Breve</div>
+              <div class="est-kpi-value" id="estoqueLow">0</div>
+            </div>
+          </div>
+          <div class="est-kpi-card">
+            <div class="est-kpi-icon red"><i class="fas fa-ban"></i></div>
+            <div>
+              <div class="est-kpi-label">Sem Estoque</div>
+              <div class="est-kpi-value" id="estoqueOut">0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="content-card" style="margin-bottom:20px;padding:16px 20px">
+          <div class="est-filter-row">
+            <input type="text" id="estoqueSearch" class="est-filter-input est-search"
+                   placeholder="Buscar produto ou marca..." oninput="_renderEstoque()" />
+            <select id="estoqueCatFilter" class="est-filter-input" onchange="_renderEstoque()"></select>
+            <label class="est-check-label">
+              <input type="checkbox" id="estoqueShowLow" onchange="_renderEstoque()" />
+              Apenas repor / sem estoque
+            </label>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="content-card" style="padding:0;overflow:hidden">
+          <div class="est-table-wrap">
+            <table class="est-table">
+              <thead>
+                <tr>
+                  <th>Produto</th>
+                  <th>Categoria</th>
+                  <th style="text-align:center">Quantidade</th>
+                  <th>Mínimo</th>
+                  <th>Status</th>
+                  <th>Atualizado</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="estoqueBody">
+                <tr><td colspan="7" class="estoque-empty">
+                  <i class="fas fa-boxes"></i><br>
+                  Nenhum produto cadastrado ainda.<br>
+                  <small>Clique em "Novo Produto" para começar.</small>
+                </td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Product modal -->
+  <div id="estoqueModal" onclick="if(event.target===this)closeEstoqueModal()">
+    <div class="est-modal-box">
+      <h3 id="estoqueModalTitle">Novo Produto</h3>
+
+      <div class="est-field">
+        <label class="est-label">Nome do Produto *</label>
+        <input id="estoqueName" type="text" class="est-input" placeholder="Ex: Base Líquida, Batom..." />
+      </div>
+      <div class="est-field">
+        <label class="est-label">Marca</label>
+        <input id="estoqueBrand" type="text" class="est-input" placeholder="Ex: MAC, L'Oréal, Maybelline..." />
+      </div>
+      <div class="est-field">
+        <label class="est-label">Categoria *</label>
+        <select id="estoqueCategory" class="est-input">
+          <option value="">Selecione...</option>
+        </select>
+      </div>
+      <div class="est-row-3">
+        <div class="est-field">
+          <label class="est-label">Qtd. atual *</label>
+          <input id="estoqueQty" type="number" class="est-input" value="1" min="0" />
+        </div>
+        <div class="est-field">
+          <label class="est-label">Qtd. mínima</label>
+          <input id="estoqueMinQty" type="number" class="est-input" value="1" min="0" />
+        </div>
+        <div class="est-field">
+          <label class="est-label">Unidade</label>
+          <select id="estoqueUnit" class="est-input">
+            <option value="un">un</option>
+            <option value="ml">ml</option>
+            <option value="g">g</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="est-modal-actions">
+        <button class="est-btn-cancel" onclick="closeEstoqueModal()">Cancelar</button>
+        <button class="est-btn-save" onclick="saveEstoqueItem()"><i class="fas fa-save"></i> Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastMsg">Ação concluída!</span>
+  </div>
+
+  <script src="../js/admin.js"></script>
+  <script src="../js/estoque.js"></script>
+  <script>
+    requireAuth();
+    loadEstoque();
+  </script>
+</body>
+</html>

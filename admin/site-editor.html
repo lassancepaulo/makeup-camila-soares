@@ -1,0 +1,787 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editor do Site — Admin Camila Soares</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="../assets/favicon.svg" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <style>
+    /* ---- Editor tabs ---- */
+    .editor-tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .editor-tab-btn {
+      padding: 9px 20px;
+      border-radius: 50px;
+      border: 1px solid rgba(0,0,0,.1);
+      background: var(--white);
+      font-size: .83rem;
+      font-weight: 500;
+      color: var(--text-light);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .editor-tab-btn.active {
+      background: var(--gradient);
+      color: var(--white);
+      border-color: transparent;
+    }
+    .editor-tab-btn:hover:not(.active) {
+      border-color: var(--rose-gold);
+      color: var(--rose-gold-dark);
+    }
+    /* ---- Panels ---- */
+    .editor-panel { display: none; }
+    .editor-panel.active { display: block; }
+
+    /* ---- Field groups ---- */
+    .editor-section {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(0,0,0,.04);
+      margin-bottom: 20px;
+    }
+    .editor-section h4 {
+      font-size: .9rem;
+      font-weight: 600;
+      color: var(--rose-gold-dark);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(201,149,108,.15);
+    }
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+    .field-row.full { grid-template-columns: 1fr; }
+    .field-group { display: flex; flex-direction: column; gap: 5px; }
+    .field-group label {
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .field-group input,
+    .field-group textarea,
+    .field-group select {
+      padding: 10px 14px;
+      border: 1px solid rgba(0,0,0,.1);
+      border-radius: 10px;
+      font-size: .9rem;
+      font-family: var(--font-sans);
+      color: var(--text);
+      background: var(--cream-light);
+      transition: border-color .2s;
+      resize: vertical;
+    }
+    .field-group input:focus,
+    .field-group textarea:focus {
+      outline: none;
+      border-color: var(--rose-gold);
+      background: #fff;
+    }
+    .field-group textarea { min-height: 90px; }
+    .field-hint {
+      font-size: .74rem;
+      color: var(--text-light);
+      font-style: italic;
+    }
+
+    /* ---- Depoimentos list ---- */
+    .dep-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+    .dep-item {
+      background: var(--cream-light);
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid rgba(201,149,108,.15);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: start;
+    }
+    .dep-item-body { display: flex; flex-direction: column; gap: 8px; }
+    .dep-item-body input,
+    .dep-item-body textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 8px;
+      font-size: .85rem;
+      font-family: var(--font-sans);
+      background: #fff;
+    }
+    .dep-item-body textarea { min-height: 70px; resize: vertical; }
+    .dep-stars { display: flex; gap: 4px; }
+    .dep-star { font-size: 1.2rem; cursor: pointer; color: #d1d5db; transition: color .1s; }
+    .dep-star.on { color: #F59E0B; }
+    .btn-dep-remove {
+      padding: 6px 12px;
+      background: #FEF2F2;
+      color: #EF4444;
+      border: 1px solid #FECACA;
+      border-radius: 8px;
+      font-size: .8rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-sans);
+    }
+    .btn-dep-add {
+      padding: 10px 20px;
+      background: var(--cream-light);
+      color: var(--rose-gold-dark);
+      border: 1px dashed var(--rose-gold);
+      border-radius: 10px;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      width: 100%;
+      transition: var(--transition);
+    }
+    .btn-dep-add:hover { background: #fdf6ef; }
+
+    /* ---- Behold instructions ---- */
+    .behold-steps {
+      background: linear-gradient(135deg, #fdf6ef, #f8f0f6);
+      border-radius: 14px;
+      padding: 20px 24px;
+      border: 1px solid rgba(201,149,108,.2);
+      margin-bottom: 16px;
+    }
+    .behold-steps h5 {
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--rose-gold-dark);
+      margin-bottom: 12px;
+    }
+    .behold-steps ol {
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .behold-steps li {
+      font-size: .88rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .behold-steps a { color: var(--rose-gold-dark); font-weight: 600; }
+
+    /* ---- Save bar ---- */
+    .editor-save-bar {
+      position: sticky;
+      bottom: 0;
+      background: var(--white);
+      border-top: 1px solid rgba(0,0,0,.06);
+      padding: 14px 0;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    /* ---- Img preview ---- */
+    .img-preview {
+      width: 80px;
+      height: 80px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 2px solid var(--rose-gold-light);
+      display: none;
+    }
+    .img-preview.show { display: block; }
+
+    @media (max-width: 640px) {
+      .field-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="admin-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-mark">cS</div>
+      <div class="sidebar-logo-text">
+        <span class="logo-text">Makeup <em>Camila</em></span>
+        <span class="logo-sub">Painel Administrativo</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Principal</div>
+      <a href="index.html"          class="sidebar-link"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="agenda.html"         class="sidebar-link"><i class="fas fa-calendar-week"></i> Agenda</a>
+      <a href="agendamentos.html"   class="sidebar-link"><i class="fas fa-calendar-check"></i> Agendamentos</a>
+      <a href="clientes.html"       class="sidebar-link"><i class="fas fa-address-book"></i> Clientes</a>
+      <a href="orcamentos.html"     class="sidebar-link"><i class="fas fa-file-invoice"></i> Orçamentos</a>
+      <a href="orcamento-novo.html" class="sidebar-link"><i class="fas fa-plus-circle"></i> Novo Orçamento</a>
+      <a href="pipeline.html"       class="sidebar-link"><i class="fas fa-project-diagram"></i> Pipeline</a>
+      <div class="nav-section-title" style="margin-top:8px">Financeiro</div>
+      <a href="faturamento.html"    class="sidebar-link"><i class="fas fa-chart-bar"></i> Faturamento</a>
+      <div class="nav-section-title" style="margin-top:8px">Operacional</div>
+      <a href="estoque.html"        class="sidebar-link"><i class="fas fa-boxes"></i> Estoque <span id="estoqueBadge" class="sidebar-badge" style="display:none"></span></a>
+      <div class="nav-section-title" style="margin-top:8px">Site</div>
+      <a href="site-editor.html"    class="sidebar-link active"><i class="fas fa-paint-brush"></i> Editor do Site</a>
+      <a href="../index.html"       class="sidebar-link" target="_blank"><i class="fas fa-external-link-alt"></i> Ver site</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar"><i class="fas fa-user"></i></div>
+        <div class="sidebar-user-info">
+          <strong>Camila Soares</strong>
+          <span>Administradora</span>
+        </div>
+      </div>
+      <button class="sidebar-logout" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Sair
+      </button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <header class="admin-header">
+      <div class="header-left">
+        <span class="header-title">Editor do Site</span>
+        <span class="header-breadcrumb">Edite textos, imagens e configurações sem tocar no código</span>
+      </div>
+      <div class="header-actions">
+        <a href="../index.html" target="_blank" class="btn-secondary-admin">
+          <i class="fas fa-eye"></i> Ver site
+        </a>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- Tabs de navegação -->
+      <div class="editor-tabs">
+        <button class="editor-tab-btn active" onclick="switchTab('hero',   this)"><i class="fas fa-home"></i>    Banner</button>
+        <button class="editor-tab-btn"         onclick="switchTab('sobre',  this)"><i class="fas fa-user"></i>    Sobre</button>
+        <button class="editor-tab-btn"         onclick="switchTab('servicos',this)"><i class="fas fa-sparkles"></i> Serviços</button>
+        <button class="editor-tab-btn"         onclick="switchTab('contato',this)"><i class="fas fa-phone"></i>   Contato</button>
+        <button class="editor-tab-btn"         onclick="switchTab('dep',    this)"><i class="fas fa-star"></i>    Depoimentos</button>
+        <button class="editor-tab-btn"         onclick="switchTab('ig',     this)"><i class="fab fa-instagram"></i> Instagram</button>
+      </div>
+
+      <!-- ============ PANEL: HERO / BANNER ============ -->
+      <div class="editor-panel active" id="panel-hero">
+        <div class="editor-section">
+          <h4><i class="fas fa-heading"></i> Textos do Banner Principal</h4>
+          <div class="field-row">
+            <div class="field-group">
+              <label>Tagline (texto pequeno acima do título)</label>
+              <input type="text" id="hero_tagline" placeholder="✦ Beleza que transforma ✦" />
+            </div>
+            <div class="field-group">
+              <label>Subtítulo</label>
+              <input type="text" id="hero_subtitle" placeholder="Makeup Artist Profissional" />
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field-group">
+              <label>Nome (parte normal)</label>
+              <input type="text" id="hero_title" placeholder="Camila" />
+            </div>
+            <div class="field-group">
+              <label>Nome (parte em itálico)</label>
+              <input type="text" id="hero_titleItalic" placeholder="Soares" />
+            </div>
+          </div>
+          <div class="field-row full">
+            <div class="field-group">
+              <label>Descrição</label>
+              <textarea id="hero_desc" placeholder="Criando experiências únicas de beleza..."></textarea>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field-group">
+              <label>Texto do botão principal</label>
+              <input type="text" id="hero_ctaPrimary" placeholder="Agende sua consultoria" />
+            </div>
+            <div class="field-group">
+              <label>Texto do botão secundário</label>
+              <input type="text" id="hero_ctaSecondary" placeholder="Ver portfólio" />
+            </div>
+          </div>
+        </div>
+        <div class="editor-section">
+          <h4><i class="fas fa-image"></i> Imagem de Fundo do Banner</h4>
+          <div class="field-row full">
+            <div class="field-group">
+              <label>URL da imagem de fundo</label>
+              <input type="url" id="hero_bgImage" placeholder="https://i.imgur.com/exemplo.jpg"
+                     oninput="previewImg(this,'prev_hero_bg')" />
+              <span class="field-hint">Cole o link direto de uma imagem (Imgur, Google Drive público, etc.)</span>
+            </div>
+          </div>
+          <img id="prev_hero_bg" class="img-preview" alt="Preview do banner" />
+        </div>
+        <div class="editor-save-bar">
+          <button class="btn-primary-admin" onclick="savePanel('hero')"><i class="fas fa-save"></i> Salvar banner</button>
+          <span id="save-msg-hero" style="font-size:.82rem;color:var(--text-light)"></span>
+        </div>
+      </div>
+
+      <!-- ============ PANEL: SOBRE ============ -->
+      <div class="editor-panel" id="panel-sobre">
+        <div class="editor-section">
+          <h4><i class="fas fa-image"></i> Foto de Perfil</h4>
+          <div class="field-row full">
+            <div class="field-group">
+              <label>URL da foto</label>
+              <input type="url" id="sobre_photo" placeholder="https://i.imgur.com/sua-foto.jpg"
+                     oninput="previewImg(this,'prev_sobre_photo')" />
+              <span class="field-hint">Recomendado: proporção 3:4 (retrato). Ex: 600×800px.</span>
+            </div>
+          </div>
+          <img id="prev_sobre_photo" class="img-preview" alt="Preview foto sobre" style="width:120px;height:160px" />
+        </div>
+        <div class="editor-section">
+          <h4><i class="fas fa-align-left"></i> Texto da seção Sobre</h4>
+          <div class="field-row full">
+            <div class="field-group">
+              <label>Parágrafo 1</label>
+              <textarea id="sobre_text1" rows="4"></textarea>
+            </div>
+          </div>
+          <div class="field-row full">
+            <div class="field-group">
+              <label>Parágrafo 2</label>
+              <textarea id="sobre_text2" rows="4"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="editor-save-bar">
+          <button class="btn-primary-admin" onclick="savePanel('sobre')"><i class="fas fa-save"></i> Salvar sobre</button>
+          <span id="save-msg-sobre" style="font-size:.82rem;color:var(--text-light)"></span>
+        </div>
+      </div>
+
+      <!-- ============ PANEL: SERVIÇOS ============ -->
+      <div class="editor-panel" id="panel-servicos">
+        <div id="servicos-editor-list"></div>
+        <div class="editor-save-bar">
+          <button class="btn-primary-admin" onclick="savePanel('servicos')"><i class="fas fa-save"></i> Salvar serviços</button>
+          <span id="save-msg-servicos" style="font-size:.82rem;color:var(--text-light)"></span>
+        </div>
+      </div>
+
+      <!-- ============ PANEL: CONTATO ============ -->
+      <div class="editor-panel" id="panel-contato">
+        <div class="editor-section">
+          <h4><i class="fab fa-whatsapp" style="color:#25D366"></i> WhatsApp</h4>
+          <div class="field-row full">
+            <div class="field-group">
+              <label>Número do WhatsApp (somente números, com DDD)</label>
+              <input type="text" id="contato_whatsapp" placeholder="5511999999999"
+                     oninput="this.value=this.value.replace(/\D/g,'')" maxlength="15" />
+              <span class="field-hint">Exemplo: 5511999999999 (código do Brasil 55 + DDD + número)</span>
+            </div>
+          </div>
+        </div>
+        <div class="editor-section">
+          <h4><i class="fab fa-instagram" style="color:#E1306C"></i> Instagram</h4>
+          <div class="field-row full">
+            <div class="field-group">
+              <label>Nome de usuário do Instagram (sem @)</label>
+              <input type="text" id="contato_instagram" placeholder="makeupcamilasoares" />
+            </div>
+          </div>
+        </div>
+        <div class="editor-section">
+          <h4><i class="fas fa-envelope" style="color:var(--rose-gold)"></i> Email e Endereço</h4>
+          <div class="field-row">
+            <div class="field-group">
+              <label>E-mail de contato</label>
+              <input type="email" id="contato_email" placeholder="contato@makeupcamilasoares.com" />
+            </div>
+            <div class="field-group">
+              <label>Endereço / Descrição do atendimento</label>
+              <input type="text" id="contato_endereco" placeholder="Domicílio e estúdio próprio" />
+            </div>
+          </div>
+        </div>
+        <div class="editor-save-bar">
+          <button class="btn-primary-admin" onclick="savePanel('contato')"><i class="fas fa-save"></i> Salvar contato</button>
+          <span id="save-msg-contato" style="font-size:.82rem;color:var(--text-light)"></span>
+        </div>
+      </div>
+
+      <!-- ============ PANEL: DEPOIMENTOS ============ -->
+      <div class="editor-panel" id="panel-dep">
+        <div class="editor-section">
+          <h4><i class="fas fa-star"></i> Depoimentos de Clientes</h4>
+          <p style="font-size:.84rem;color:var(--text-light);margin-bottom:16px">
+            Adicione, edite ou remova depoimentos. Deixe em branco para usar os depoimentos padrão do site.
+          </p>
+          <div class="dep-list" id="depList"></div>
+          <button class="btn-dep-add" onclick="addDep()">
+            <i class="fas fa-plus"></i> Adicionar depoimento
+          </button>
+        </div>
+        <div class="editor-save-bar">
+          <button class="btn-primary-admin" onclick="savePanel('dep')"><i class="fas fa-save"></i> Salvar depoimentos</button>
+          <span id="save-msg-dep" style="font-size:.82rem;color:var(--text-light)"></span>
+        </div>
+      </div>
+
+      <!-- ============ PANEL: INSTAGRAM / BEHOLD ============ -->
+      <div class="editor-panel" id="panel-ig">
+        <div class="editor-section">
+          <h4><i class="fab fa-instagram" style="color:#E1306C"></i> Feed automático do Instagram (Behold.so)</h4>
+
+          <div class="behold-steps">
+            <h5>Como configurar em 3 passos:</h5>
+            <ol>
+              <li>Acesse <a href="https://behold.so" target="_blank">behold.so</a> e crie uma conta gratuita.</li>
+              <li>Conecte sua conta do Instagram e crie um <strong>Feed</strong>. Copie o <strong>Feed ID</strong> (aparece na URL ou no painel, ex: <code>abc123xyz</code>).</li>
+              <li>Cole o Feed ID abaixo e salve. O site vai exibir automaticamente seus últimos posts!</li>
+            </ol>
+          </div>
+
+          <div class="field-row full">
+            <div class="field-group">
+              <label>Feed ID do Behold.so</label>
+              <input type="text" id="ig_feedId" placeholder="Cole aqui o Feed ID (ex: abc123xyz)" />
+              <span class="field-hint">Deixe em branco para manter o portfólio estático atual.</span>
+            </div>
+          </div>
+
+          <div id="ig-status" style="margin-top:12px;font-size:.84rem;color:var(--text-light)"></div>
+        </div>
+
+        <div class="editor-section">
+          <h4><i class="fas fa-images"></i> Imagens do Portfólio Estático</h4>
+          <p style="font-size:.84rem;color:var(--text-light);margin-bottom:4px">
+            Quando não há Feed ID configurado, o site mostra estas imagens estáticas no portfólio.
+            Cole URLs de imagens para cada slot (deixe vazio para manter o placeholder).
+          </p>
+          <div id="portfolio-imgs-list" style="margin-top:14px"></div>
+        </div>
+
+        <div class="editor-save-bar">
+          <button class="btn-primary-admin" onclick="savePanel('ig')"><i class="fas fa-save"></i> Salvar Instagram</button>
+          <span id="save-msg-ig" style="font-size:.82rem;color:var(--text-light)"></span>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </main>
+</div>
+
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle"></i>
+  <span id="toastMsg">Salvo!</span>
+</div>
+
+<script src="../js/services-config.js"></script>
+<script src="../js/admin.js"></script>
+<script>
+'use strict';
+
+requireAuth();
+initEstoqueBadge();
+
+const CFG_KEY = 'camilaSiteConfig';
+
+const SERVICES_META = [
+  { key: 'noiva',     label: 'Noiva',             icon: 'fa-ring' },
+  { key: 'madrinhas', label: 'Madrinhas',          icon: 'fa-users' },
+  { key: 'formatura', label: 'Formatura',          icon: 'fa-graduation-cap' },
+  { key: 'ensaio',    label: 'Ensaio Fotográfico', icon: 'fa-camera' },
+  { key: 'evento',    label: 'Eventos Sociais',    icon: 'fa-star' },
+  { key: 'aula',      label: 'Aulas Particulares', icon: 'fa-chalkboard-teacher' }
+];
+
+const PORTFOLIO_SLOTS = [
+  { id: 'noiva01',    cat: 'noiva',     label: 'Noiva 01' },
+  { id: 'formatura01',cat: 'formatura', label: 'Formatura 01' },
+  { id: 'editorial01',cat: 'editorial', label: 'Editorial 01' },
+  { id: 'noiva02',    cat: 'noiva',     label: 'Noiva 02' },
+  { id: 'social01',   cat: 'social',    label: 'Social 01' },
+  { id: 'formatura02',cat: 'formatura', label: 'Formatura 02' },
+  { id: 'editorial02',cat: 'editorial', label: 'Editorial 02' },
+  { id: 'social02',   cat: 'social',    label: 'Social 02' },
+  { id: 'noiva03',    cat: 'noiva',     label: 'Noiva 03' }
+];
+
+// ---- Leitura / escrita config ----
+function readCfg() {
+  try { return JSON.parse(localStorage.getItem(CFG_KEY) || '{}'); }
+  catch { return {}; }
+}
+function writeCfg(data) {
+  const existing = readCfg();
+  const merged   = Object.assign({}, existing, data);
+  localStorage.setItem(CFG_KEY, JSON.stringify(merged));
+}
+
+// ---- Switch de aba ----
+function switchTab(panel, btn) {
+  document.querySelectorAll('.editor-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.editor-tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('panel-' + panel).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ---- Preview de imagem ----
+function previewImg(input, previewId) {
+  const prev = document.getElementById(previewId);
+  if (!prev) return;
+  if (input.value) {
+    prev.src = input.value;
+    prev.classList.add('show');
+    prev.onerror = function() { prev.classList.remove('show'); };
+  } else {
+    prev.classList.remove('show');
+  }
+}
+
+// ---- Salvar por panel ----
+function savePanel(panel) {
+  const cfg = readCfg();
+
+  if (panel === 'hero') {
+    cfg.hero = {
+      tagline:      document.getElementById('hero_tagline').value,
+      title:        document.getElementById('hero_title').value,
+      titleItalic:  document.getElementById('hero_titleItalic').value,
+      subtitle:     document.getElementById('hero_subtitle').value,
+      desc:         document.getElementById('hero_desc').value,
+      ctaPrimary:   document.getElementById('hero_ctaPrimary').value,
+      ctaSecondary: document.getElementById('hero_ctaSecondary').value,
+      bgImage:      document.getElementById('hero_bgImage').value
+    };
+  }
+
+  if (panel === 'sobre') {
+    cfg.sobre = {
+      photo: document.getElementById('sobre_photo').value,
+      text1: document.getElementById('sobre_text1').value,
+      text2: document.getElementById('sobre_text2').value
+    };
+  }
+
+  if (panel === 'servicos') {
+    cfg.servicos = {};
+    SERVICES_META.forEach(function(s) {
+      cfg.servicos[s.key] = {
+        title: document.getElementById('svc_title_' + s.key).value,
+        desc:  document.getElementById('svc_desc_'  + s.key).value
+      };
+    });
+  }
+
+  if (panel === 'contato') {
+    cfg.contato = {
+      whatsapp:  document.getElementById('contato_whatsapp').value.replace(/\D/g, ''),
+      instagram: document.getElementById('contato_instagram').value.replace('@', ''),
+      email:     document.getElementById('contato_email').value,
+      endereco:  document.getElementById('contato_endereco').value
+    };
+  }
+
+  if (panel === 'dep') {
+    cfg.depoimentos = collectDeps();
+  }
+
+  if (panel === 'ig') {
+    if (!cfg.portfolio) cfg.portfolio = {};
+    cfg.portfolio.beholdFeedId = document.getElementById('ig_feedId').value.trim();
+
+    // Imagens estáticas
+    cfg.portfolio.images = {};
+    PORTFOLIO_SLOTS.forEach(function(slot) {
+      const el = document.getElementById('port_' + slot.id);
+      if (el) cfg.portfolio.images[slot.id] = el.value.trim();
+    });
+
+    const feedId = cfg.portfolio.beholdFeedId;
+    const status = document.getElementById('ig-status');
+    if (feedId) {
+      status.innerHTML = '<i class="fas fa-check-circle" style="color:#10B981"></i> Feed ID configurado. O site exibirá os posts do Instagram automaticamente.';
+    } else {
+      status.innerHTML = 'Sem Feed ID — o portfólio estático será exibido.';
+    }
+  }
+
+  localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+  showToast('Alterações salvas! Abra o site para ver.');
+
+  const msgEl = document.getElementById('save-msg-' + panel);
+  if (msgEl) {
+    msgEl.textContent = '✓ Salvo às ' + new Date().toLocaleTimeString('pt-BR');
+    setTimeout(function() { msgEl.textContent = ''; }, 4000);
+  }
+}
+
+// ---- Depoimentos CRUD ----
+var depData = [];
+
+function renderDeps() {
+  const list = document.getElementById('depList');
+  if (!list) return;
+  if (!depData.length) {
+    list.innerHTML = '<p style="font-size:.84rem;color:var(--text-light);font-style:italic">Nenhum depoimento cadastrado. Adicione um abaixo.</p>';
+    return;
+  }
+  list.innerHTML = depData.map(function(d, i) {
+    const stars = [1,2,3,4,5].map(function(n) {
+      return '<span class="dep-star ' + (n <= (d.stars||5) ? 'on' : '') + '" onclick="setStars(' + i + ',' + n + ')">★</span>';
+    }).join('');
+    return '<div class="dep-item">'
+      + '<div class="dep-item-body">'
+      + '<div class="dep-stars" id="dep-stars-' + i + '">' + stars + '</div>'
+      + '<textarea placeholder="Texto do depoimento" oninput="depData[' + i + '].text=this.value">' + _esc(d.text||'') + '</textarea>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+      + '<input type="text" placeholder="Nome (ex: Ana Paula M.)" value="' + _esc(d.name||'') + '" oninput="depData[' + i + '].name=this.value" />'
+      + '<input type="text" placeholder="Data/serviço (ex: Noiva – Mar 2025)" value="' + _esc(d.date||'') + '" oninput="depData[' + i + '].date=this.value" />'
+      + '</div></div>'
+      + '<button class="btn-dep-remove" onclick="removeDep(' + i + ')"><i class="fas fa-trash"></i></button>'
+      + '</div>';
+  }).join('');
+}
+
+function addDep() {
+  depData.push({ text: '', name: '', date: '', stars: 5 });
+  renderDeps();
+  document.getElementById('depList').lastElementChild.querySelector('textarea').focus();
+}
+
+function removeDep(i) {
+  depData.splice(i, 1);
+  renderDeps();
+}
+
+function setStars(i, n) {
+  depData[i].stars = n;
+  renderDeps();
+}
+
+function collectDeps() {
+  // Relê os textareas/inputs pelo DOM pois o oninput pode ter lag
+  const items = document.querySelectorAll('.dep-item');
+  return Array.from(items).map(function(el, i) {
+    return {
+      text:  el.querySelector('textarea') ? el.querySelector('textarea').value : (depData[i]||{}).text||'',
+      name:  el.querySelectorAll('input')[0] ? el.querySelectorAll('input')[0].value : (depData[i]||{}).name||'',
+      date:  el.querySelectorAll('input')[1] ? el.querySelectorAll('input')[1].value : (depData[i]||{}).date||'',
+      stars: (depData[i]||{}).stars || 5
+    };
+  }).filter(function(d) { return d.text || d.name; });
+}
+
+function _esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ---- Renderiza painel de serviços ----
+function renderServicosPanel() {
+  const cfg  = readCfg();
+  const svcs = cfg.servicos || {};
+  const list = document.getElementById('servicos-editor-list');
+  if (!list) return;
+  list.innerHTML = SERVICES_META.map(function(s) {
+    const saved = svcs[s.key] || {};
+    return '<div class="editor-section">'
+      + '<h4><i class="fas ' + s.icon + '"></i> ' + s.label + '</h4>'
+      + '<div class="field-row">'
+      + '<div class="field-group"><label>Título do card</label>'
+      + '<input type="text" id="svc_title_' + s.key + '" value="' + _esc(saved.title || s.label) + '" /></div>'
+      + '<div class="field-group"><label>Descrição curta</label>'
+      + '<input type="text" id="svc_desc_' + s.key + '" value="' + _esc(saved.desc  || '') + '" /></div>'
+      + '</div></div>';
+  }).join('');
+}
+
+// ---- Renderiza portfólio estático slots ----
+function renderPortfolioSlots() {
+  const cfg    = readCfg();
+  const images = (cfg.portfolio && cfg.portfolio.images) || {};
+  const list   = document.getElementById('portfolio-imgs-list');
+  if (!list) return;
+  list.innerHTML = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">'
+    + PORTFOLIO_SLOTS.map(function(slot) {
+      const val = images[slot.id] || '';
+      return '<div style="display:flex;flex-direction:column;gap:6px">'
+        + '<label style="font-size:.75rem;font-weight:600;color:var(--text-light)">' + slot.label + ' <em style="font-weight:400">(' + slot.cat + ')</em></label>'
+        + '<input id="port_' + slot.id + '" type="url" placeholder="URL da imagem" value="' + _esc(val) + '" style="padding:8px 10px;border:1px solid rgba(0,0,0,.1);border-radius:8px;font-size:.82rem;font-family:var(--font-sans)" />'
+        + (val ? '<img src="' + _esc(val) + '" style="width:100%;height:70px;object-fit:cover;border-radius:8px;border:1px solid rgba(201,149,108,.2)" />' : '')
+        + '</div>';
+    }).join('')
+    + '</div>';
+}
+
+// ---- Carrega todos os campos com valores salvos ----
+function loadAllFields() {
+  const cfg = readCfg();
+
+  // Hero
+  const h = cfg.hero || {};
+  document.getElementById('hero_tagline').value      = h.tagline      || '';
+  document.getElementById('hero_title').value        = h.title        || '';
+  document.getElementById('hero_titleItalic').value  = h.titleItalic  || '';
+  document.getElementById('hero_subtitle').value     = h.subtitle     || '';
+  document.getElementById('hero_desc').value         = h.desc         || '';
+  document.getElementById('hero_ctaPrimary').value   = h.ctaPrimary   || '';
+  document.getElementById('hero_ctaSecondary').value = h.ctaSecondary || '';
+  document.getElementById('hero_bgImage').value      = h.bgImage      || '';
+  if (h.bgImage) previewImg(document.getElementById('hero_bgImage'), 'prev_hero_bg');
+
+  // Sobre
+  const s = cfg.sobre || {};
+  document.getElementById('sobre_photo').value = s.photo || '';
+  document.getElementById('sobre_text1').value = s.text1 || '';
+  document.getElementById('sobre_text2').value = s.text2 || '';
+  if (s.photo) previewImg(document.getElementById('sobre_photo'), 'prev_sobre_photo');
+
+  // Serviços
+  renderServicosPanel();
+
+  // Contato
+  const c = cfg.contato || {};
+  document.getElementById('contato_whatsapp').value  = c.whatsapp  || '';
+  document.getElementById('contato_instagram').value = c.instagram || '';
+  document.getElementById('contato_email').value     = c.email     || '';
+  document.getElementById('contato_endereco').value  = c.endereco  || '';
+
+  // Depoimentos
+  depData = (cfg.depoimentos && cfg.depoimentos.length) ? JSON.parse(JSON.stringify(cfg.depoimentos)) : [];
+  renderDeps();
+
+  // Instagram
+  const p = cfg.portfolio || {};
+  document.getElementById('ig_feedId').value = p.beholdFeedId || '';
+  if (p.beholdFeedId) {
+    document.getElementById('ig-status').innerHTML =
+      '<i class="fas fa-check-circle" style="color:#10B981"></i> Feed ID configurado.';
+  }
+  renderPortfolioSlots();
+}
+
+// Inicializa
+document.addEventListener('DOMContentLoaded', loadAllFields);
+</script>
+</body>
+</html>

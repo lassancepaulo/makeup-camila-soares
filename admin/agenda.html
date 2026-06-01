@@ -1,0 +1,415 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agenda Semanal — Admin Camila Soares</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="../assets/favicon.svg" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <style>
+    /* ── AGENDA WEEK VIEW ── */
+    .agenda-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .agenda-nav-btn {
+      background: var(--white);
+      border: 1px solid rgba(0,0,0,.1);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: .82rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .agenda-nav-btn:hover { background: var(--cream); }
+    .agenda-nav-btn.today { background: var(--gradient); color: #fff; border-color: transparent; }
+    #agendaWeekLabel {
+      font-weight: 600;
+      font-size: .95rem;
+      color: var(--dark-soft);
+      min-width: 210px;
+      text-align: center;
+    }
+    .agenda-conflict-badge {
+      background: #FEE2E2;
+      color: #DC2626;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: .75rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Grid */
+    .agenda-scroll { overflow-x: auto; }
+    .agenda-header-row,
+    .agenda-slot-row {
+      display: grid;
+      grid-template-columns: 56px repeat(7, minmax(100px, 1fr));
+    }
+    .agenda-header-row {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: var(--white);
+      border-bottom: 2px solid rgba(0,0,0,.06);
+    }
+    .agenda-time-col { /* spacer */ }
+    .agenda-day-col {
+      padding: 10px 6px;
+      text-align: center;
+      border-left: 1px solid rgba(0,0,0,.05);
+    }
+    .agenda-day-col.is-today { background: #FBF5F0; }
+    .agenda-dow {
+      font-size: .68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--text-light);
+    }
+    .agenda-dom {
+      font-size: .9rem;
+      font-weight: 600;
+      color: var(--dark-soft);
+      margin-top: 2px;
+    }
+    .agenda-dom.today-circle {
+      background: var(--gradient);
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .82rem;
+    }
+
+    /* Slot rows */
+    .agenda-slot-row {
+      min-height: 32px;
+      border-bottom: 1px solid rgba(0,0,0,.04);
+    }
+    .agenda-slot-row:nth-child(odd) { background: rgba(0,0,0,.01); }
+    .agenda-time-label {
+      font-size: .68rem;
+      color: var(--text-light);
+      text-align: right;
+      padding-right: 8px;
+      padding-top: 4px;
+      line-height: 1;
+    }
+    .agenda-time-label.is-hour {
+      font-weight: 600;
+      color: var(--text);
+    }
+    .agenda-cell {
+      border-left: 1px solid rgba(0,0,0,.05);
+      padding: 2px;
+      min-height: 32px;
+      position: relative;
+    }
+    .agenda-cell.is-today { background: #FBF5F0; }
+
+    /* Booking blocks */
+    .agenda-block {
+      border-radius: 6px;
+      padding: 4px 6px;
+      margin-bottom: 2px;
+      font-size: .72rem;
+      line-height: 1.3;
+      cursor: pointer;
+      position: relative;
+      transition: opacity .15s;
+    }
+    .agenda-block:hover { opacity: .85; }
+    .agenda-block.status-pendente   { background: #FEF3C7; border-left: 3px solid #F59E0B; color: #92400E; }
+    .agenda-block.status-confirmado { background: #D1FAE5; border-left: 3px solid #10B981; color: #064E3B; }
+    .agenda-block.status-concluido  { background: #EDE9FE; border-left: 3px solid #7C3AED; color: #4C1D95; }
+    .agenda-block.status-aprovado   { background: #DBEAFE; border-left: 3px solid #2563EB; color: #1E3A8A; }
+    .agenda-block.status-pago       { background: #D1FAE5; border-left: 3px solid #059669; color: #064E3B; }
+    .agenda-block.status-cancelado,
+    .agenda-block.status-rejeitado  { background: #FEE2E2; border-left: 3px solid #DC2626; color: #7F1D1D; opacity:.7; }
+    .agenda-block.conflict          { outline: 2px solid #EF4444; }
+    .ab-name    { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ab-service { font-size: .65rem; }
+    .ab-warn    { position: absolute; top: 3px; right: 4px; color: #EF4444; font-size: .7rem; }
+
+    /* Detail modal */
+    #agendaDetailModal {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .adm-panel {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 28px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: var(--shadow-md);
+    }
+    .adm-panel h3 {
+      font-family: var(--font-serif);
+      font-size: 1.15rem;
+      color: var(--dark-soft);
+      margin-bottom: 20px;
+    }
+    .adm-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      font-size: .84rem;
+    }
+    .adm-row i { color: var(--rose-gold-dark); width: 16px; margin-top: 2px; }
+    .adm-row-label { color: var(--text-light); min-width: 70px; font-size: .75rem; }
+    .adm-row-val   { color: var(--dark-soft); font-weight: 500; }
+    .adm-status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+    .adm-status-badge.status-pendente   { background: #FEF3C7; color: #92400E; }
+    .adm-status-badge.status-confirmado { background: #D1FAE5; color: #064E3B; }
+    .adm-status-badge.status-concluido  { background: #EDE9FE; color: #4C1D95; }
+    .adm-status-badge.status-aprovado   { background: #DBEAFE; color: #1E3A8A; }
+    .adm-status-badge.status-pago       { background: #D1FAE5; color: #064E3B; }
+    .adm-status-badge.status-cancelado  { background: #FEE2E2; color: #7F1D1D; }
+    .adm-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .adm-btn-wa {
+      background: #25D366;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 18px;
+      font-size: .82rem;
+      font-weight: 600;
+      font-family: inherit;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .adm-btn-edit {
+      background: var(--cream);
+      color: var(--dark-soft);
+      border: none;
+      border-radius: 8px;
+      padding: 9px 18px;
+      font-size: .82rem;
+      font-weight: 600;
+      font-family: inherit;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .adm-btn-close {
+      background: none;
+      border: 1px solid rgba(0,0,0,.12);
+      border-radius: 8px;
+      padding: 9px 16px;
+      font-size: .82rem;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    /* Legend */
+    .agenda-legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: .72rem;
+      color: var(--text-light);
+    }
+    .legend-dot {
+      display: inline-block;
+      width: 10px; height: 10px;
+      border-radius: 2px;
+      margin-right: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-wrapper">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-mark">cS</div>
+        <div class="sidebar-logo-text">
+          <span class="logo-text">Makeup <em>Camila</em></span>
+          <span class="logo-sub">Painel Administrativo</span>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Principal</div>
+        <a href="index.html"          class="sidebar-link"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="agenda.html"         class="sidebar-link active"><i class="fas fa-calendar-week"></i> Agenda</a>
+        <a href="agendamentos.html"   class="sidebar-link"><i class="fas fa-calendar-check"></i> Agendamentos</a>
+        <a href="clientes.html"       class="sidebar-link"><i class="fas fa-address-book"></i> Clientes</a>
+        <a href="orcamentos.html"     class="sidebar-link"><i class="fas fa-file-invoice"></i> Orçamentos</a>
+        <a href="orcamento-novo.html" class="sidebar-link"><i class="fas fa-plus-circle"></i> Novo Orçamento</a>
+        <a href="pipeline.html"       class="sidebar-link"><i class="fas fa-project-diagram"></i> Pipeline</a>
+        <div class="nav-section-title" style="margin-top:8px">Financeiro</div>
+        <a href="faturamento.html"    class="sidebar-link"><i class="fas fa-chart-bar"></i> Faturamento</a>
+        <div class="nav-section-title" style="margin-top:8px">Operacional</div>
+        <a href="estoque.html"        class="sidebar-link"><i class="fas fa-boxes"></i> Estoque <span id="estoqueBadge" class="sidebar-badge" style="display:none"></span></a>
+        <div class="nav-section-title" style="margin-top:8px">Site</div>
+        <a href="site-editor.html"    class="sidebar-link"><i class="fas fa-paint-brush"></i> Editor do Site</a>
+        <a href="../index.html"       class="sidebar-link" target="_blank"><i class="fas fa-external-link-alt"></i> Ver site</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="sidebar-avatar"><i class="fas fa-user"></i></div>
+          <div class="sidebar-user-info"><strong>Camila Soares</strong><span>Administradora</span></div>
+        </div>
+        <button class="sidebar-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <header class="admin-header">
+        <div class="header-left">
+          <span class="header-title">Agenda</span>
+          <span class="header-breadcrumb">Visão semanal de atendimentos</span>
+        </div>
+        <div class="header-actions">
+          <a href="agendamentos.html" class="btn-header btn-header-secondary"><i class="fas fa-calendar-check"></i> Agendamentos</a>
+          <a href="orcamento-novo.html" class="btn-header btn-header-primary"><i class="fas fa-plus"></i> Novo Orçamento</a>
+        </div>
+      </header>
+
+      <div class="page-content">
+
+        <!-- Nav bar -->
+        <div class="content-card" style="margin-bottom:20px;padding:16px 20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+            <div class="agenda-nav">
+              <button class="agenda-nav-btn" onclick="agendaPrev()"><i class="fas fa-chevron-left"></i></button>
+              <span id="agendaWeekLabel">—</span>
+              <button class="agenda-nav-btn" onclick="agendaNext()"><i class="fas fa-chevron-right"></i></button>
+              <button class="agenda-nav-btn today" onclick="agendaToday()">Hoje</button>
+              <span id="agendaConflicts" class="agenda-conflict-badge" style="display:none">
+                <i class="fas fa-exclamation-triangle"></i> 0 conflitos
+              </span>
+            </div>
+            <div class="agenda-legend">
+              <span><span class="legend-dot" style="background:#F59E0B"></span>Pendente</span>
+              <span><span class="legend-dot" style="background:#10B981"></span>Confirmado</span>
+              <span><span class="legend-dot" style="background:#2563EB"></span>Aprovado</span>
+              <span><span class="legend-dot" style="background:#7C3AED"></span>Concluído</span>
+              <span><span class="legend-dot" style="background:#DC2626"></span>Cancelado</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calendar grid -->
+        <div class="content-card" style="padding:0;overflow:hidden">
+          <div class="agenda-scroll">
+            <div id="agendaGrid"></div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Detail modal -->
+  <div id="agendaDetailModal" onclick="if(event.target===this)closeAgendaDetail()">
+    <div class="adm-panel">
+      <h3><i class="fas fa-calendar-day" style="color:var(--rose-gold-dark);margin-right:8px"></i>Detalhes do Atendimento</h3>
+      <div class="adm-row">
+        <i class="fas fa-user"></i>
+        <div>
+          <div class="adm-row-label">Cliente</div>
+          <div class="adm-row-val" id="adm-name">—</div>
+        </div>
+      </div>
+      <div class="adm-row">
+        <i class="fas fa-magic"></i>
+        <div>
+          <div class="adm-row-label">Serviço</div>
+          <div class="adm-row-val" id="adm-service">—</div>
+        </div>
+      </div>
+      <div class="adm-row">
+        <i class="fas fa-calendar"></i>
+        <div>
+          <div class="adm-row-label">Data</div>
+          <div class="adm-row-val" id="adm-date">—</div>
+        </div>
+      </div>
+      <div class="adm-row">
+        <i class="fas fa-clock"></i>
+        <div>
+          <div class="adm-row-label">Horário</div>
+          <div class="adm-row-val" id="adm-time">—</div>
+        </div>
+      </div>
+      <div class="adm-row">
+        <i class="fas fa-map-marker-alt"></i>
+        <div>
+          <div class="adm-row-label">Endereço</div>
+          <div class="adm-row-val" id="adm-address">—</div>
+        </div>
+      </div>
+      <div class="adm-row">
+        <i class="fas fa-phone"></i>
+        <div>
+          <div class="adm-row-label">Telefone</div>
+          <div class="adm-row-val" id="adm-phone">—</div>
+        </div>
+      </div>
+      <div class="adm-row">
+        <i class="fas fa-tag"></i>
+        <div>
+          <div class="adm-row-label">Status</div>
+          <span class="adm-status-badge" id="adm-status">—</span>
+        </div>
+      </div>
+      <div class="adm-actions">
+        <a href="#" id="adm-wa-btn" target="_blank" class="adm-btn-wa"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+        <a href="agendamentos.html" id="adm-edit-btn" class="adm-btn-edit"><i class="fas fa-pencil-alt"></i> Editar</a>
+        <button class="adm-btn-close" onclick="closeAgendaDetail()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastMsg">Ação concluída!</span>
+  </div>
+
+  <script src="../js/admin.js"></script>
+  <script src="../js/agenda.js"></script>
+  <script>
+    requireAuth();
+    initEstoqueBadge();
+    loadAgenda();
+  </script>
+</body>
+</html>

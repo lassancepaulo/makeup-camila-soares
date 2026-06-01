@@ -1,0 +1,331 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Faturamento — Admin Camila Soares</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="../assets/favicon.svg" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <style>
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px)  { .kpi-grid { grid-template-columns: 1fr; } }
+
+    .kpi-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(0,0,0,.04);
+    }
+    .kpi-card .kpi-label {
+      font-size: .72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--text-light);
+      margin-bottom: 6px;
+    }
+    .kpi-card .kpi-value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--dark-soft);
+      line-height: 1.1;
+    }
+    .kpi-card .kpi-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem;
+      margin-bottom: 10px;
+    }
+    .kpi-icon.green  { background: #D1FAE5; color: #059669; }
+    .kpi-icon.red    { background: #FEE2E2; color: #DC2626; }
+    .kpi-icon.blue   { background: #DBEAFE; color: #2563EB; }
+    .kpi-icon.amber  { background: #FEF3C7; color: #D97706; }
+    .kpi-icon.rose   { background: linear-gradient(135deg,#f5e6d3,#e8c9d8); color: var(--rose-gold-dark); }
+    .kpi-icon.purple { background: #EDE9FE; color: #7C3AED; }
+
+    .chart-wrapper-tall { position: relative; height: 280px; }
+    .chart-wrapper-sm   { position: relative; height: 200px; }
+
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .filter-select {
+      padding: 7px 12px;
+      border: 1px solid rgba(0,0,0,.1);
+      border-radius: 8px;
+      font-size: .8rem;
+      font-family: inherit;
+      background: var(--white);
+      cursor: pointer;
+    }
+
+    .funnel-labels {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 12px;
+    }
+    .funnel-label {
+      text-align: center;
+    }
+    .funnel-label .fl-val { font-size: 1.4rem; font-weight: 700; color: var(--dark-soft); }
+    .funnel-label .fl-lbl { font-size: .72rem; color: var(--text-light); text-transform: uppercase; letter-spacing: .5px; }
+    .funnel-label .fl-pct { font-size: .78rem; font-weight: 600; color: var(--rose-gold-dark); }
+
+    .section-divider {
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-light);
+      margin: 24px 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(0,0,0,.07);
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-wrapper">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-mark">cS</div>
+        <div class="sidebar-logo-text">
+          <span class="logo-text">Makeup <em>Camila</em></span>
+          <span class="logo-sub">Painel Administrativo</span>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Principal</div>
+        <a href="index.html"          class="sidebar-link"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="agenda.html"         class="sidebar-link"><i class="fas fa-calendar-week"></i> Agenda</a>
+        <a href="agendamentos.html"   class="sidebar-link"><i class="fas fa-calendar-check"></i> Agendamentos</a>
+        <a href="clientes.html"       class="sidebar-link"><i class="fas fa-address-book"></i> Clientes</a>
+        <a href="orcamentos.html"     class="sidebar-link"><i class="fas fa-file-invoice"></i> Orçamentos</a>
+        <a href="orcamento-novo.html" class="sidebar-link"><i class="fas fa-plus-circle"></i> Novo Orçamento</a>
+        <a href="pipeline.html"       class="sidebar-link"><i class="fas fa-project-diagram"></i> Pipeline</a>
+        <div class="nav-section-title" style="margin-top:8px">Financeiro</div>
+        <a href="faturamento.html"    class="sidebar-link active"><i class="fas fa-chart-bar"></i> Faturamento</a>
+        <div class="nav-section-title" style="margin-top:8px">Operacional</div>
+        <a href="estoque.html"        class="sidebar-link"><i class="fas fa-boxes"></i> Estoque <span id="estoqueBadge" class="sidebar-badge" style="display:none"></span></a>
+        <div class="nav-section-title" style="margin-top:8px">Site</div>
+        <a href="site-editor.html"    class="sidebar-link"><i class="fas fa-paint-brush"></i> Editor do Site</a>
+        <a href="../index.html"       class="sidebar-link" target="_blank"><i class="fas fa-external-link-alt"></i> Ver site</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="sidebar-avatar"><i class="fas fa-user"></i></div>
+          <div class="sidebar-user-info"><strong>Camila Soares</strong><span>Administradora</span></div>
+        </div>
+        <button class="sidebar-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <header class="admin-header">
+        <div class="header-left">
+          <span class="header-title">Faturamento</span>
+          <span class="header-breadcrumb">Receita · Despesas · Lucro · Conversão</span>
+        </div>
+        <div class="header-actions">
+          <select id="yearFilter" class="btn-header btn-header-secondary" style="padding:9px 16px;border:none;font-size:.82rem;cursor:pointer;"></select>
+        </div>
+      </header>
+
+      <div class="page-content">
+
+        <!-- ── KPIs Linha 1: Financeiro ── -->
+        <div class="section-divider"><i class="fas fa-coins"></i> Financeiro anual</div>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon green"><i class="fas fa-coins"></i></div>
+            <div class="kpi-label">Faturamento Bruto</div>
+            <div class="kpi-value" id="fatTotal">R$ 0</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon red"><i class="fas fa-minus-circle"></i></div>
+            <div class="kpi-label">Total Despesas</div>
+            <div class="kpi-value" id="fatDespesas">R$ 0</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon green"><i class="fas fa-hand-holding-usd"></i></div>
+            <div class="kpi-label">Lucro Líquido</div>
+            <div class="kpi-value" id="fatLucro">R$ 0</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon amber"><i class="fas fa-percentage"></i></div>
+            <div class="kpi-label">Margem de Lucro</div>
+            <div class="kpi-value" id="fatMargem">0%</div>
+          </div>
+        </div>
+
+        <!-- ── KPIs Linha 2: Propostas + Período ── -->
+        <div class="section-divider"><i class="fas fa-bullseye"></i> Propostas e período</div>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon rose"><i class="fas fa-calendar-check"></i></div>
+            <div class="kpi-label">Mês Atual</div>
+            <div class="kpi-value" id="fatMesAtual">R$ 0</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon blue"><i class="fas fa-chart-line"></i></div>
+            <div class="kpi-label">Média Mensal</div>
+            <div class="kpi-value" id="fatMedia">R$ 0</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon amber"><i class="fas fa-bullseye"></i></div>
+            <div class="kpi-label">Taxa de Conversão</div>
+            <div class="kpi-value" id="fatConversao">0%</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon purple"><i class="fas fa-trophy"></i></div>
+            <div class="kpi-label">Melhor Mês</div>
+            <div class="kpi-value" style="font-size:1rem" id="fatMelhor">—</div>
+          </div>
+        </div>
+
+        <!-- ── Funil de Conversão ── -->
+        <div class="section-divider"><i class="fas fa-filter"></i> Funil de conversão</div>
+        <div class="content-card" style="margin-bottom:24px">
+          <div class="funnel-labels" id="funnelLabels">
+            <div class="funnel-label">
+              <div class="fl-val" id="fatPropostas">0</div>
+              <div class="fl-lbl">Propostas criadas</div>
+              <div class="fl-pct">100%</div>
+            </div>
+            <div style="display:flex;align-items:center;color:var(--text-light);font-size:1.5rem">→</div>
+            <div class="funnel-label">
+              <div class="fl-val" id="fatAprovadas">0</div>
+              <div class="fl-lbl">Aprovadas</div>
+              <div class="fl-pct" id="fatAprovadasPct">—</div>
+            </div>
+            <div style="display:flex;align-items:center;color:var(--text-light);font-size:1.5rem">→</div>
+            <div class="funnel-label">
+              <div class="fl-val" id="fatPagas">0</div>
+              <div class="fl-lbl">Pagas</div>
+              <div class="fl-pct" id="fatConversaoPct">—</div>
+            </div>
+          </div>
+          <div class="chart-wrapper-sm" style="margin-top:16px">
+            <canvas id="conversionChart"></canvas>
+          </div>
+        </div>
+
+        <!-- ── Receita × Despesas × Lucro ── -->
+        <div class="section-divider"><i class="fas fa-chart-bar"></i> Receita × Despesas × Lucro por mês</div>
+        <div class="content-card" style="margin-bottom:24px">
+          <div class="chart-wrapper-tall">
+            <canvas id="revenueExpensesChart"></canvas>
+          </div>
+        </div>
+
+        <!-- ── Serviços + Despesas por Categoria ── -->
+        <div class="content-grid" style="margin-bottom:24px">
+          <div class="content-card">
+            <div class="card-header filter-row">
+              <h3 class="card-title">Receita por Serviço</h3>
+              <select class="filter-select" id="servicoFilter" onchange="renderFaturamentoV2(_fatYear)">
+                <option value="">Todos os serviços</option>
+                <option value="noiva">Noiva</option>
+                <option value="madrinhas">Madrinhas</option>
+                <option value="formatura">Formatura</option>
+                <option value="ensaio">Ensaio Fotográfico</option>
+                <option value="evento">Evento Social</option>
+                <option value="social">Make Social</option>
+                <option value="aula">Aula Particular</option>
+              </select>
+            </div>
+            <div class="chart-wrapper-tall">
+              <canvas id="servicosChart"></canvas>
+            </div>
+          </div>
+          <div class="content-card">
+            <div class="card-header">
+              <h3 class="card-title">Despesas por Categoria</h3>
+            </div>
+            <div class="chart-wrapper-tall">
+              <canvas id="despesasChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Status + Pagamento ── -->
+        <div class="section-divider"><i class="fas fa-credit-card"></i> Status e formas de pagamento</div>
+        <div class="content-grid" style="margin-bottom:24px">
+          <div class="content-card">
+            <div class="card-header"><h3 class="card-title">Status de Pagamentos</h3></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center">
+              <div class="chart-wrapper-sm"><canvas id="statusChart"></canvas></div>
+              <div id="statusLegend"></div>
+            </div>
+          </div>
+          <div class="content-card">
+            <div class="card-header"><h3 class="card-title">Formas de Pagamento</h3></div>
+            <div class="chart-wrapper-sm"><canvas id="paymentChart"></canvas></div>
+          </div>
+        </div>
+
+        <!-- ── Transações ── -->
+        <div class="section-divider"><i class="fas fa-receipt"></i> Histórico de transações pagas</div>
+        <div class="content-card">
+          <div id="transactionsContainer">
+            <div class="empty-state"><i class="fas fa-receipt"></i><p>Nenhuma transação registrada</p></div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastMsg">Ação concluída!</span>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/admin.js"></script>
+  <script src="../js/faturamento.js"></script>
+  <script>
+    requireAuth();
+    initEstoqueBadge();
+    loadFaturamentoV2();
+
+    // Atualiza % funil conforme renderização
+    const _origRender = renderFaturamentoV2;
+    window.renderFaturamentoV2 = function(year) {
+      _origRender(year);
+      const total    = parseInt(document.getElementById('fatPropostas')?.textContent) || 0;
+      const aprovadas = parseInt(document.getElementById('fatAprovadas')?.textContent) || 0;
+      const pagas    = parseInt(document.getElementById('fatPagas')?.textContent) || 0;
+      const ap = document.getElementById('fatAprovadasPct');
+      const pp = document.getElementById('fatConversaoPct');
+      if (ap) ap.textContent = total > 0 ? `${Math.round(aprovadas/total*100)}% de conversão` : '—';
+      if (pp) pp.textContent = total > 0 ? `${Math.round(pagas/total*100)}% de conversão` : '—';
+    };
+    // Re-render once for %
+    renderFaturamentoV2(_fatYear);
+  </script>
+</body>
+</html>

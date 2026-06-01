@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 278 58">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F07272"/>
+      <stop offset="100%" stop-color="#D85A5A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Marca quadrada -->
+  <rect width="58" height="58" rx="12" fill="url(#g)"/>
+  <text x="29" y="42"
+    font-family="Georgia,'Times New Roman',serif"
+    font-size="29"
+    font-style="italic"
+    font-weight="bold"
+    fill="white"
+    text-anchor="middle">cS</text>
+
+  <!-- Eyebrow: MAKEUP -->
+  <text x="72" y="20"
+    font-family="Arial,Helvetica,sans-serif"
+    font-size="9"
+    font-weight="700"
+    fill="#8A6060"
+    letter-spacing="3.5">MAKEUP</text>
+
+  <!-- Wordmark: CAMILA (normal) -->
+  <text x="72" y="46"
+    font-family="Georgia,'Playfair Display',serif"
+    font-size="21"
+    font-weight="700"
+    fill="#3D1E1E">CAMILA</text>
+
+  <!-- Wordmark: SOARES (coral italic) -->
+  <text x="155" y="46"
+    font-family="Georgia,'Playfair Display',serif"
+    font-size="21"
+    font-style="italic"
+    font-weight="400"
+    fill="#F07272"> SOARES</text>
+</svg>
