@@ -97,7 +97,7 @@ const PAYMENT_LABELS = {
 function formatMoney(val) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
 }
-const formatBRL = formatMoney;
+var formatBRL = formatMoney;
 
 // Show/hide estoque low-stock badge in sidebar (called on every admin page)
 function initEstoqueBadge() {
