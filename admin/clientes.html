@@ -157,6 +157,8 @@
 </div>
 
 <script src="../js/services-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/supabase-client.js"></script>
 <script src="../js/admin.js"></script>
 <script>
 requireAuth();
@@ -262,7 +264,8 @@ const SOURCE_LABELS = {
   outros:    'Outros'
 };
 
-function loadClientesPage() {
+async function loadClientesPage() {
+  await DB.prefetchAll(['camilaClientes', 'camilaAgendamentos', 'camilaOrcamentos']);
   // Build client list from bookings + quotes if no dedicated client store
   const bookings = getAllBookings();
   const quotes   = getAll();
@@ -307,7 +310,10 @@ function loadClientesPage() {
         });
       }
     });
-    if (clients.length) localStorage.setItem(DS_KEY, JSON.stringify(clients));
+    if (clients.length) {
+      localStorage.setItem(DS_KEY, JSON.stringify(clients));
+      DB.sync('camilaClientes', clients);
+    }
   }
 
   renderClientStats(clients);

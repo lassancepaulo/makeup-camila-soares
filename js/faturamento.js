@@ -8,7 +8,8 @@ let _fatYear = new Date().getFullYear();
 let _chartInstances = {};
 
 // ── Bootstrap ─────────────────────────────────────────────
-function loadFaturamentoV2() {
+async function loadFaturamentoV2() {
+  await DB.prefetchAll(['camilaOrcamentos', 'camilaCustos']);
   const yearSel = document.getElementById('yearFilter');
   const now     = new Date();
 

@@ -37,6 +37,7 @@ function getAllBookings() {
 
 function saveAllBookings(data) {
   localStorage.setItem(BOOKINGS_KEY, JSON.stringify(data));
+  DB.sync('camilaAgendamentos', data);
 }
 
 function updateBookingStatus(id, status, extra = {}) {
@@ -59,7 +60,12 @@ function getBookingById(id) {
 // ---------- MAIN LOAD ----------
 let currentFilter = 'todos';
 
-function loadAgendamentosPage() {
+async function loadAgendamentosPage() {
+  await DB.prefetchAll(['camilaAgendamentos', 'camilaCustos']);
+  const studio = await DB.getConfig('studioAddress');
+  if (studio !== null) localStorage.setItem('camilaStudioAddress', studio);
+  const fuel = await DB.getConfig('fuelPrefs');
+  if (fuel !== null) localStorage.setItem('camilaFuelPrefs', JSON.stringify(fuel));
   renderStats();
   renderBookings();
 }

@@ -180,6 +180,8 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../js/supabase-client.js"></script>
   <script src="../js/admin.js"></script>
   <script>
     requireAuth();
@@ -187,7 +189,9 @@
     loadDashboard();
     loadMetaCard();
 
-    function loadMetaCard() {
+    async function loadMetaCard() {
+      const metaConfig = await DB.getConfig('meta');
+      if (metaConfig !== null) localStorage.setItem('camilaMeta', JSON.stringify(metaConfig));
       const meta    = JSON.parse(localStorage.getItem('camilaMeta') || '{}');
       const goal    = meta.monthly || 0;
       const now     = new Date();
@@ -219,6 +223,7 @@
       const num = parseFloat(val.replace(',', '.'));
       if (!isNaN(num) && num >= 0) {
         localStorage.setItem('camilaMeta', JSON.stringify({ monthly: num }));
+        DB.setConfig('meta', { monthly: num });
         loadMetaCard();
         showToast('Meta atualizada!');
       }

@@ -38,6 +38,7 @@ const DS = {
 
   _write(entity, data) {
     localStorage.setItem(this._keys[entity], JSON.stringify(data));
+    if (window.DB) DB.sync(this._keys[entity], data);
   },
 
   // ── CRUD ──────────────────────────────────────────────────

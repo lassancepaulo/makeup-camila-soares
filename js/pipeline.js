@@ -13,7 +13,8 @@ let _pipelineData  = [];
 let _editingCardId = null;
 let _dragCardId    = null;
 
-function loadPipeline() {
+async function loadPipeline() {
+  await DB.prefetch('camilaPipeline');
   _pipelineData = JSON.parse(localStorage.getItem('camilaPipeline') || '[]');
   _renderPipeline();
   _renderPipelineStats();
@@ -21,6 +22,7 @@ function loadPipeline() {
 
 function _savePipeline() {
   localStorage.setItem('camilaPipeline', JSON.stringify(_pipelineData));
+  DB.sync('camilaPipeline', _pipelineData);
 }
 
 function _renderPipelineStats() {

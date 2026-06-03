@@ -194,6 +194,7 @@ function saveBooking(booking) {
   const all = getAllBookings();
   all.unshift(booking);
   localStorage.setItem(BOOKINGS_KEY, JSON.stringify(all));
+  if (window.DB) DB.sync('camilaAgendamentos', all);
 }
 
 function getAllBookings() {

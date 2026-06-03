@@ -27,6 +27,7 @@ function getAll() {
 
 function saveAll(data) {
   localStorage.setItem(DB_KEY, JSON.stringify(data));
+  DB.sync('camilaOrcamentos', data);
 }
 
 function getById(id) {
@@ -62,6 +63,7 @@ function getAllBookings() {
 
 function saveBookingData(bookings) {
   localStorage.setItem(BOOKINGS_DB_KEY, JSON.stringify(bookings));
+  DB.sync('camilaAgendamentos', bookings);
 }
 
 function updateBooking(id, changes) {
@@ -101,10 +103,14 @@ const formatBRL = formatMoney;
 function initEstoqueBadge() {
   const badge = document.getElementById('estoqueBadge');
   if (!badge) return;
-  const data  = JSON.parse(localStorage.getItem('camilaEstoque') || '[]');
-  const count = data.filter(i => i.qty <= i.minQty).length;
-  badge.textContent   = count;
-  badge.style.display = count > 0 ? 'inline-flex' : 'none';
+  const _update = () => {
+    const data  = JSON.parse(localStorage.getItem('camilaEstoque') || '[]');
+    const count = data.filter(i => i.qty <= i.minQty).length;
+    badge.textContent   = count;
+    badge.style.display = count > 0 ? 'inline-flex' : 'none';
+  };
+  _update();
+  DB.prefetch('camilaEstoque').then(_update);
 }
 
 function formatDate(dateStr) {
@@ -126,7 +132,8 @@ function showToast(msg, type = 'success') {
 }
 
 // ===================== DASHBOARD =====================
-function loadDashboard() {
+async function loadDashboard() {
+  await DB.prefetchAll(['camilaOrcamentos', 'camilaAgendamentos']);
   const all = getAll();
   const now = new Date();
   const thisMonth = now.getMonth();
@@ -310,7 +317,8 @@ function statusLabel(s) {
 }
 
 // ===================== ORÇAMENTOS PAGE =====================
-function loadOrcamentosPage() {
+async function loadOrcamentosPage() {
+  await DB.prefetch('camilaOrcamentos');
   let all = getAll();
 
   function render() {
@@ -392,7 +400,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ===================== ORÇAMENTO FORM =====================
-function initOrcamentoForm() {
+async function initOrcamentoForm() {
+  await DB.prefetch('camilaOrcamentos');
   // Generate or load quote number
   const params = new URLSearchParams(window.location.search);
   const editId = params.get('id');

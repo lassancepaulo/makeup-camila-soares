@@ -9,7 +9,8 @@ const ESTOQUE_UNITS = ['un', 'ml', 'g'];
 let _estoqueData      = [];
 let _editingEstoqueId = null;
 
-function loadEstoque() {
+async function loadEstoque() {
+  await DB.prefetch('camilaEstoque');
   _estoqueData = JSON.parse(localStorage.getItem('camilaEstoque') || '[]');
   _populateCatFilter();
   _renderEstoque();
@@ -18,6 +19,7 @@ function loadEstoque() {
 
 function _saveEstoque() {
   localStorage.setItem('camilaEstoque', JSON.stringify(_estoqueData));
+  DB.sync('camilaEstoque', _estoqueData);
   initEstoqueBadge();
 }
 

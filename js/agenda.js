@@ -2,8 +2,9 @@
 
 let _agendaDate = new Date();
 
-function loadAgenda() {
+async function loadAgenda() {
   _agendaDate = new Date();
+  await DB.prefetchAll(['camilaAgendamentos', 'camilaOrcamentos']);
   _renderAgendaWeek();
 }
 

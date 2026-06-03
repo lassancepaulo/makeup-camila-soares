@@ -34,6 +34,7 @@ function getCustos_all() {
 }
 function setCustos_all(data) {
   localStorage.setItem(CUSTOS_KEY, JSON.stringify(data));
+  DB.sync('camilaCustos', data);
 }
 
 function custos_save(custo) {
@@ -87,6 +88,7 @@ function getStudioAddress() {
 }
 function setStudioAddress(addr) {
   localStorage.setItem(STUDIO_KEY, addr.trim());
+  DB.setConfig('studioAddress', addr.trim());
 }
 
 function getFuelPrefs() {
@@ -95,6 +97,7 @@ function getFuelPrefs() {
 }
 function setFuelPrefs(prefs) {
   localStorage.setItem(FUEL_PREF_KEY, JSON.stringify(prefs));
+  DB.setConfig('fuelPrefs', prefs);
 }
 
 // ── Cálculo de deslocamento ────────────────────────────────
