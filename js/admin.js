@@ -318,33 +318,39 @@ function statusLabel(s) {
 
 // ===================== ORÇAMENTOS PAGE =====================
 async function loadOrcamentosPage() {
-  await DB.prefetch('camilaOrcamentos');
-  let all = getAll();
+  let all = [];
 
   function render() {
-    const search = document.getElementById('searchInput')?.value.toLowerCase() || '';
-    const status = document.getElementById('filterStatus')?.value || '';
+    const search  = document.getElementById('searchInput')?.value.toLowerCase() || '';
+    const status  = document.getElementById('filterStatus')?.value || '';
     const servico = document.getElementById('filterServico')?.value || '';
-    const mes = document.getElementById('filterMes')?.value || '';
+    const mes     = document.getElementById('filterMes')?.value || '';
 
     let filtered = all.filter(q => {
-      const matchSearch = !search ||
-        q.clientName?.toLowerCase().includes(search) ||
-        q.serviceType?.toLowerCase().includes(search) ||
-        q.id?.toLowerCase().includes(search);
-      const matchStatus = !status || q.status === status;
+      const matchSearch  = !search  || q.clientName?.toLowerCase().includes(search) || q.serviceType?.toLowerCase().includes(search) || q.id?.toLowerCase().includes(search);
+      const matchStatus  = !status  || q.status === status;
       const matchServico = !servico || q.serviceType === servico;
-      const matchMes = !mes || (q.eventDate && q.eventDate.startsWith(mes));
+      const matchMes     = !mes     || (q.eventDate && q.eventDate.startsWith(mes));
       return matchSearch && matchStatus && matchServico && matchMes;
     });
 
     const container = document.getElementById('quotesTableContainer');
-    const count = document.getElementById('tableCount');
+    const count     = document.getElementById('tableCount');
     if (container) container.innerHTML = buildQuoteTable(filtered, false);
     if (count) count.textContent = `${filtered.length} registro${filtered.length !== 1 ? 's' : ''}`;
   }
 
-  // Populate month filter
+  // Listeners imediatos — filtros prontos assim que a página carrega
+  document.getElementById('searchInput')?.addEventListener('input', render);
+  document.getElementById('filterStatus')?.addEventListener('change', render);
+  document.getElementById('filterServico')?.addEventListener('change', render);
+  document.getElementById('filterMes')?.addEventListener('change', render);
+
+  // Async: busca dados e renderiza
+  await DB.prefetch('camilaOrcamentos');
+  all = getAll();
+
+  // Popula filtro de mês com os meses disponíveis
   const months = [...new Set(all.map(q => q.eventDate?.substring(0, 7)).filter(Boolean))].sort().reverse();
   const mesFilter = document.getElementById('filterMes');
   if (mesFilter) {
@@ -355,12 +361,7 @@ async function loadOrcamentosPage() {
       opt.textContent = `${MONTHS_FULL[parseInt(mo) - 1]} ${y}`;
       mesFilter.appendChild(opt);
     });
-    mesFilter.addEventListener('change', render);
   }
-
-  document.getElementById('searchInput')?.addEventListener('input', render);
-  document.getElementById('filterStatus')?.addEventListener('change', render);
-  document.getElementById('filterServico')?.addEventListener('change', render);
 
   render();
 }
@@ -401,27 +402,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ===================== ORÇAMENTO FORM =====================
 async function initOrcamentoForm() {
-  await DB.prefetch('camilaOrcamentos');
-  // Generate or load quote number
-  const params = new URLSearchParams(window.location.search);
-  const editId = params.get('id');
-
-  if (editId) {
-    document.getElementById('pageTitle').textContent = 'Editar Orçamento';
-    const q = getById(editId);
-    if (q) loadFormData(q);
-  } else {
-    document.getElementById('quoteNumber').value = generateId();
-    addItemRow(); // start with one empty row
-  }
-
-  // Add item button
+  // ── Event listeners sincronos — botões funcionam imediatamente ──
   document.getElementById('addItemBtn')?.addEventListener('click', () => addItemRow());
-
-  // Discount input
   document.getElementById('discountInput')?.addEventListener('input', updateTotals);
 
-  // Phone mask
   const phoneInput = document.getElementById('clientPhone');
   phoneInput?.addEventListener('input', () => {
     let v = phoneInput.value.replace(/\D/g, '').substring(0, 11);
@@ -431,7 +415,6 @@ async function initOrcamentoForm() {
     phoneInput.value = v;
   });
 
-  // Form submit
   document.getElementById('orcamentoForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const quote = buildQuoteFromForm();
@@ -440,13 +423,27 @@ async function initOrcamentoForm() {
     setTimeout(() => window.location.href = 'orcamentos.html', 1500);
   });
 
-  // Save and PDF
   document.getElementById('saveAndPdfBtn')?.addEventListener('click', () => {
     const quote = buildQuoteFromForm();
     saveQuote(quote);
     showToast('Orçamento salvo! Gerando PDF...');
     setTimeout(() => generatePDF(quote), 500);
   });
+
+  // ── Async: carrega dados do Supabase e inicializa form ──
+  await DB.prefetch('camilaOrcamentos');
+
+  const params = new URLSearchParams(window.location.search);
+  const editId = params.get('id');
+
+  if (editId) {
+    document.getElementById('pageTitle').textContent = 'Editar Orçamento';
+    const q = getById(editId);
+    if (q) loadFormData(q);
+  } else {
+    document.getElementById('quoteNumber').value = generateId();
+    addItemRow(); // linha inicial vazia
+  }
 }
 
 function addItemRow(desc = '', qty = 1, price = 0) {
