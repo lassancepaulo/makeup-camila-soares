@@ -131,24 +131,37 @@ function applySiteConfig() {
       '?text=' + encodeURIComponent('Olá Camila! Gostaria de solicitar um orçamento para maquiagem.');
   }
 
-  // Link e handle do Instagram
-  const igLink = document.getElementById('instagram-link');
-  if (igLink) igLink.href = 'https://instagram.com/' + igHandle;
+  // Links e handle do Instagram (todos os links com instagram.com no href)
+  document.querySelectorAll('a[href*="instagram.com"]').forEach(function(a) {
+    a.href = 'https://instagram.com/' + igHandle;
+  });
   _setText('#instagram-handle', '@' + igHandle);
 
-  // Email
-  document.querySelectorAll('a[href^="mailto:"]').forEach(function(a) {
-    a.href = 'mailto:' + cfg.contato.email;
-    if (a.textContent.includes('@')) a.textContent = cfg.contato.email;
-  });
+  // Email — links e texto visível
+  if (cfg.contato.email) {
+    document.querySelectorAll('a[href^="mailto:"]').forEach(function(a) {
+      a.href = 'mailto:' + cfg.contato.email;
+      if (a.textContent.includes('@')) a.textContent = cfg.contato.email;
+    });
+    document.querySelectorAll('.contato-value-email').forEach(function(el) {
+      el.textContent = cfg.contato.email;
+    });
+  }
 
   // Textos de contato visíveis
-  document.querySelectorAll('.contato-item.whatsapp .contato-value, .contato-value-phone').forEach(function(el) {
+  document.querySelectorAll('.contato-value-phone').forEach(function(el) {
     el.textContent = _formatPhone(wppNum);
   });
-  document.querySelectorAll('.contato-item.instagram .contato-value, .contato-value-ig').forEach(function(el) {
+  document.querySelectorAll('.contato-value-ig').forEach(function(el) {
     el.textContent = '@' + igHandle;
   });
+
+  // Endereço / local de atendimento
+  if (cfg.contato.endereco) {
+    document.querySelectorAll('.contato-value-local').forEach(function(el) {
+      el.textContent = cfg.contato.endereco;
+    });
+  }
 
   // ---- DEPOIMENTOS ----
   if (cfg.depoimentos && cfg.depoimentos.length > 0) {
