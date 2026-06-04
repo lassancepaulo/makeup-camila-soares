@@ -192,22 +192,16 @@ function applySiteConfig() {
     if (portfolioGrid)   portfolioGrid.style.display   = 'none';
     if (portfolioFilter) portfolioFilter.style.display = 'none';
 
-    // Injeta widget Behold.so
+    // Injeta widget Behold.so (API moderna — custom element)
     const inner = document.getElementById('behold-feed-inner');
     if (inner && !document.getElementById('behold-widget-' + feedId)) {
-      inner.innerHTML = '<div id="behold-widget-' + feedId + '"></div>';
-      window.beholdWidgets = window.beholdWidgets || [];
-      window.beholdWidgets.push({
-        id: feedId,
-        theme: 'light',
-        columns: 3,
-        rows: 2,
-        gap: 12
-      });
-      const s = document.createElement('script');
-      s.defer = true;
-      s.src   = 'https://cdn.behold.so/widget.js';
-      document.body.appendChild(s);
+      inner.innerHTML = '<behold-widget id="behold-widget-' + feedId + '" feed-id="' + feedId + '"></behold-widget>';
+      if (!document.querySelector('script[src*="behold.so"]')) {
+        const s = document.createElement('script');
+        s.type = 'module';
+        s.src  = 'https://w.behold.so/widget.js';
+        document.body.appendChild(s);
+      }
     }
   }
 }
