@@ -185,17 +185,17 @@ function applySiteConfig() {
   const beholdContainer = document.getElementById('behold-feed-container');
   const portfolioGrid   = document.getElementById('portfolioGrid');
   const portfolioFilter = document.querySelector('.portfolio-filter');
-  const beholdWidget    = document.getElementById('behold-widget-main');
 
   if (feedId) {
-    // Mostra feed do Instagram e oculta grid de placeholders
-    if (beholdContainer) beholdContainer.style.display = 'block';
+    // Oculta grid de placeholders
     if (portfolioGrid)   portfolioGrid.style.display   = 'none';
     if (portfolioFilter) portfolioFilter.style.display = 'none';
-    // Ativa o widget Behold (script já carregado no <head>)
-    if (beholdWidget) beholdWidget.setAttribute('feed-id', feedId);
+    // Insere widget com feed-id correto (custom element já registrado pelo script do <head>)
+    if (beholdContainer) {
+      beholdContainer.style.display = 'block';
+      beholdContainer.innerHTML = '<behold-widget feed-id="' + feedId + '"></behold-widget>';
+    }
   } else {
-    // Sem feed configurado — garante que o grid estático aparece
     if (beholdContainer) beholdContainer.style.display = 'none';
     if (portfolioGrid)   portfolioGrid.style.display   = '';
     if (portfolioFilter) portfolioFilter.style.display = '';
