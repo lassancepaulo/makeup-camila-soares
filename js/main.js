@@ -214,7 +214,10 @@ form?.addEventListener('submit', (e) => {
   if (mensagem) msg += `\n*Mensagem:* ${mensagem}`;
 
   const encoded = encodeURIComponent(msg);
-  window.open(`https://wa.me/5511999999999?text=${encoded}`, '_blank');
+  // Lê número do admin (siteConfig no localStorage), fallback para default
+  let _wppNum = '5511999999999';
+  try { const _c = JSON.parse(localStorage.getItem('camilaSiteConfig')||'{}'); _wppNum = (_c.contato&&_c.contato.whatsapp) ? _c.contato.whatsapp.replace(/\D/g,'') : _wppNum; } catch(e) {}
+  window.open(`https://wa.me/${_wppNum}?text=${encoded}`, '_blank');
 
   form.style.display = 'none';
   formSuccess.style.display = 'block';

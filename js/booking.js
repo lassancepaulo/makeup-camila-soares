@@ -5,8 +5,16 @@
 
 'use strict';
 
-const BOOKINGS_KEY    = 'camilaAgendamentos';
-const CAMILA_WHATSAPP = '5511999999999';
+const BOOKINGS_KEY = 'camilaAgendamentos';
+
+// Lê número do WhatsApp salvo pelo admin (siteConfig), fallback para default
+function _getWppNum() {
+  try {
+    const cfg = JSON.parse(localStorage.getItem('camilaSiteConfig') || '{}');
+    const num = (cfg.contato && cfg.contato.whatsapp) ? cfg.contato.whatsapp.replace(/\D/g, '') : '';
+    return num || '5511999999999';
+  } catch (e) { return '5511999999999'; }
+}
 
 const BOOKING_SERVICE_LABELS = {
   noiva:     'Noiva (Dia Exclusivo)',
@@ -141,7 +149,7 @@ function submitBooking() {
   saveBooking(booking);
 
   const msg = buildCamilaNotification(booking);
-  window.open(`https://wa.me/${CAMILA_WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank');
+  window.open(`https://wa.me/${_getWppNum()}?text=${encodeURIComponent(msg)}`, '_blank');
 
   document.querySelector('.booking-wrapper').style.display = 'none';
   document.getElementById('bookingSuccess').style.display  = 'block';
