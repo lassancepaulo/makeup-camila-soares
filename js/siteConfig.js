@@ -182,27 +182,23 @@ function applySiteConfig() {
 
   // ---- PORTFOLIO / BEHOLD ----
   const feedId = cfg.portfolio && cfg.portfolio.beholdFeedId;
-  if (feedId) {
-    // Mostra container do feed e oculta o grid estático
-    const beholdContainer = document.getElementById('behold-feed-container');
-    const portfolioGrid   = document.getElementById('portfolioGrid');
-    const portfolioFilter = document.querySelector('.portfolio-filter');
+  const beholdContainer = document.getElementById('behold-feed-container');
+  const portfolioGrid   = document.getElementById('portfolioGrid');
+  const portfolioFilter = document.querySelector('.portfolio-filter');
+  const beholdWidget    = document.getElementById('behold-widget-main');
 
+  if (feedId) {
+    // Mostra feed do Instagram e oculta grid de placeholders
     if (beholdContainer) beholdContainer.style.display = 'block';
     if (portfolioGrid)   portfolioGrid.style.display   = 'none';
     if (portfolioFilter) portfolioFilter.style.display = 'none';
-
-    // Injeta widget Behold.so (API moderna — custom element)
-    const inner = document.getElementById('behold-feed-inner');
-    if (inner && !document.getElementById('behold-widget-' + feedId)) {
-      inner.innerHTML = '<behold-widget id="behold-widget-' + feedId + '" feed-id="' + feedId + '"></behold-widget>';
-      if (!document.querySelector('script[src*="behold.so"]')) {
-        const s = document.createElement('script');
-        s.type = 'module';
-        s.src  = 'https://w.behold.so/widget.js';
-        document.body.appendChild(s);
-      }
-    }
+    // Ativa o widget Behold (script já carregado no <head>)
+    if (beholdWidget) beholdWidget.setAttribute('feed-id', feedId);
+  } else {
+    // Sem feed configurado — garante que o grid estático aparece
+    if (beholdContainer) beholdContainer.style.display = 'none';
+    if (portfolioGrid)   portfolioGrid.style.display   = '';
+    if (portfolioFilter) portfolioFilter.style.display = '';
   }
 }
 
