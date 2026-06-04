@@ -626,6 +626,7 @@ function savePanel(panel) {
   }
 
   localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+  if (window.DB) DB.setConfig('siteConfig', cfg); // persiste no Supabase
   showToast('Alterações salvas! Abra o site para ver.');
 
   const msgEl = document.getElementById('save-msg-' + panel);
@@ -733,7 +734,16 @@ function renderPortfolioSlots() {
 }
 
 // ---- Carrega todos os campos com valores salvos ----
-function loadAllFields() {
+async function loadAllFields() {
+  // Busca config remota do Supabase e atualiza localStorage antes de renderizar
+  if (window.DB) {
+    try {
+      const remote = await window.DB.getConfig('siteConfig');
+      if (remote) localStorage.setItem(CFG_KEY, JSON.stringify(remote));
+    } catch (e) {
+      console.warn('[site-editor] Supabase getConfig falhou, usando localStorage', e);
+    }
+  }
   const cfg = readCfg();
 
   // Hero

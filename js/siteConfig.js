@@ -218,9 +218,23 @@ function _formatPhone(num) {
   return num;
 }
 
-// Aplica assim que o DOM estiver pronto
+/* ---- Supabase: carrega config remota antes de aplicar ao DOM ---- */
+async function _initFromSupabase() {
+  if (!window.DB) return;
+  try {
+    const remote = await window.DB.getConfig('siteConfig');
+    if (remote) localStorage.setItem(SITE_CONFIG_KEY, JSON.stringify(remote));
+  } catch (e) {
+    console.warn('[siteConfig] Supabase fetch falhou, usando localStorage', e);
+  }
+}
+
+// Aplica assim que o DOM estiver pronto (busca Supabase antes)
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', applySiteConfig);
+  document.addEventListener('DOMContentLoaded', async function () {
+    await _initFromSupabase();
+    applySiteConfig();
+  });
 } else {
-  applySiteConfig();
+  _initFromSupabase().then(applySiteConfig);
 }
