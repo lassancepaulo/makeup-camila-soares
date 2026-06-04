@@ -142,7 +142,7 @@ async function loadDashboard() {
   const total = all.length;
   const pendentes = all.filter(q => q.status === 'pendente').length;
   const pagosThisMonth = all.filter(q => {
-    if (q.status !== 'pago') return false;
+    if (q.status !== 'pago' && q.status !== 'aprovado') return false;
     const d = new Date(q.eventDate || q.createdAt);
     return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
   });
@@ -575,8 +575,8 @@ function generatePDF(quote) {
   const isNoiva  = quote.serviceType === 'noiva';
   const svcLabel = SERVICE_LABELS[quote.serviceType] || quote.serviceType || 'Servico';
   const pctNum   = Math.round(((quote.depositPct) || 0.30) * 100);
-  const depositV = quote.depositValue   || (typeof calcDeposit   === 'function' ? calcDeposit(quote.serviceType,   quote.numPeople) : 0);
-  const remainV  = quote.remainingValue || (typeof calcRemaining === 'function' ? calcRemaining(quote.serviceType, quote.numPeople) : 0);
+  const depositV = Math.round((quote.total || 0) * pctNum / 100);
+  const remainV  = (quote.total || 0) - depositV;
 
   // ======================================================
   // PAGINA 1 — ORCAMENTO (design original)
@@ -940,7 +940,7 @@ function renderFaturamento(year) {
   const all = getAll();
   const now = new Date();
 
-  const paid = all.filter(q => q.status === 'pago' && q.eventDate && q.eventDate.startsWith(String(year)));
+  const paid = all.filter(q => (q.status === 'pago' || q.status === 'aprovado') && q.eventDate && q.eventDate.startsWith(String(year)));
 
   const annual = paid.reduce((s, q) => s + (q.total || 0), 0);
 
@@ -972,7 +972,7 @@ function renderFaturamento(year) {
 
   // Services chart
   const servCounts = {};
-  all.filter(q => q.status === 'pago' && q.eventDate?.startsWith(String(year)))
+  all.filter(q => (q.status === 'pago' || q.status === 'aprovado') && q.eventDate?.startsWith(String(year)))
     .forEach(q => { servCounts[q.serviceType] = (servCounts[q.serviceType] || 0) + 1; });
   buildServicosChart(servCounts);
 
