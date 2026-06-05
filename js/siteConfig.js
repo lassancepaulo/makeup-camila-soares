@@ -109,24 +109,30 @@ function applySiteConfig() {
     }
   }
 
-  // Texto do Sobre: substitui todos os .sobre-text pelo conteúdo salvo (separa por \n\n em parágrafos)
+  // Texto do Sobre: substitui parágrafos pelo conteúdo salvo (separa por \n\n)
   if (cfg.sobre.text1) {
     const sobreContent = document.querySelector('.sobre-content');
-    const existingTexts = document.querySelectorAll('.sobre-text');
-    if (sobreContent && existingTexts.length) {
-      // Remove parágrafos antigos
-      existingTexts.forEach(el => el.remove());
-      // Insere novos parágrafos antes de .sobre-certs
+    if (sobreContent) {
+      const existingTexts = Array.from(sobreContent.querySelectorAll('.sobre-text'));
       const certs = sobreContent.querySelector('.sobre-certs');
-      const paras = cfg.sobre.text1.split(/\n\n+/).filter(t => t.trim());
-      paras.forEach(function(t) {
-        const p = document.createElement('p');
-        p.className = 'sobre-text';
-        p.textContent = t.trim();
-        sobreContent.insertBefore(p, certs);
-      });
+      const paras = cfg.sobre.text1.split(/\n\n+/).map(function(t) { return t.trim(); }).filter(Boolean);
+      if (existingTexts.length && paras.length) {
+        existingTexts.forEach(function(el) { el.remove(); });
+        paras.forEach(function(t) {
+          var p = document.createElement('p');
+          p.className = 'sobre-text';
+          p.textContent = t;
+          if (certs) sobreContent.insertBefore(p, certs);
+          else sobreContent.appendChild(p);
+        });
+      }
     }
   }
+
+  // Badges/Certificações
+  if (cfg.sobre.cert1) _setText('#cert1-text', cfg.sobre.cert1);
+  if (cfg.sobre.cert2) _setText('#cert2-text', cfg.sobre.cert2);
+  if (cfg.sobre.cert3) _setText('#cert3-text', cfg.sobre.cert3);
 
   // ---- CONTATO ----
   const wppNum = cfg.contato.whatsapp.replace(/\D/g, '');

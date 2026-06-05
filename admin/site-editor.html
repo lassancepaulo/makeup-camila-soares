@@ -355,17 +355,30 @@
           <img id="prev_sobre_photo" class="img-preview" alt="Preview foto sobre" style="width:120px;height:160px" />
         </div>
         <div class="editor-section">
-          <h4><i class="fas fa-align-left"></i> Texto da seção Sobre</h4>
+          <h4><i class="fas fa-align-left"></i> Bio / Texto da seção Sobre</h4>
           <div class="field-row full">
             <div class="field-group">
-              <label>Parágrafo 1</label>
-              <textarea id="sobre_text1" rows="4"></textarea>
+              <label>Texto completo (use linha em branco para separar parágrafos)</label>
+              <textarea id="sobre_text1" rows="10" placeholder="Escreva aqui a bio da Camila. Deixe uma linha em branco entre os parágrafos."></textarea>
             </div>
           </div>
-          <div class="field-row full">
+        </div>
+        <div class="editor-section">
+          <h4><i class="fas fa-award"></i> Ícones de destaque (3 badges abaixo do texto)</h4>
+          <div class="field-row">
             <div class="field-group">
-              <label>Parágrafo 2</label>
-              <textarea id="sobre_text2" rows="4"></textarea>
+              <label><i class="fas fa-award" style="color:#C9956C"></i> Badge 1</label>
+              <input type="text" id="sobre_cert1" placeholder="Ex: Certificada pela Academia..." />
+            </div>
+            <div class="field-group">
+              <label><i class="fas fa-graduation-cap" style="color:#C9956C"></i> Badge 2</label>
+              <input type="text" id="sobre_cert2" placeholder="Ex: Especialização em noivas..." />
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field-group">
+              <label><i class="fas fa-camera" style="color:#C9956C"></i> Badge 3</label>
+              <input type="text" id="sobre_cert3" placeholder="Ex: Experiência em editorials..." />
             </div>
           </div>
         </div>
@@ -578,7 +591,10 @@ function savePanel(panel) {
     cfg.sobre = {
       photo: document.getElementById('sobre_photo').value,
       text1: document.getElementById('sobre_text1').value,
-      text2: document.getElementById('sobre_text2').value
+      text2: '',
+      cert1: document.getElementById('sobre_cert1').value,
+      cert2: document.getElementById('sobre_cert2').value,
+      cert3: document.getElementById('sobre_cert3').value
     };
   }
 
@@ -762,7 +778,9 @@ async function loadAllFields() {
   const s = cfg.sobre || {};
   document.getElementById('sobre_photo').value = s.photo || '';
   document.getElementById('sobre_text1').value = s.text1 || '';
-  document.getElementById('sobre_text2').value = s.text2 || '';
+  document.getElementById('sobre_cert1').value = s.cert1 || '';
+  document.getElementById('sobre_cert2').value = s.cert2 || '';
+  document.getElementById('sobre_cert3').value = s.cert3 || '';
   if (s.photo) previewImg(document.getElementById('sobre_photo'), 'prev_sobre_photo');
 
   // Serviços
