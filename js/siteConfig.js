@@ -95,22 +95,21 @@ function applySiteConfig() {
 
   // ---- SOBRE ----
   if (cfg.sobre.photo) {
-    const sobreImg = document.querySelector('.sobre-img-frame img, .sobre-img-placeholder');
+    // Tenta img já existente; senão pega o placeholder e substitui
+    const sobreImg = document.querySelector('.image-frame img');
+    const sobrePlaceholder = document.querySelector('.sobre-placeholder');
     if (sobreImg) {
-      if (sobreImg.tagName === 'IMG') {
-        sobreImg.src = cfg.sobre.photo;
-      } else {
-        // placeholder → substituir por img
-        const img = document.createElement('img');
-        img.src = cfg.sobre.photo;
-        img.alt = 'Camila Soares';
-        img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:inherit';
-        sobreImg.replaceWith(img);
-      }
+      sobreImg.src = cfg.sobre.photo;
+    } else if (sobrePlaceholder) {
+      const img = document.createElement('img');
+      img.src = cfg.sobre.photo;
+      img.alt = 'Camila Soares';
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:inherit';
+      sobrePlaceholder.replaceWith(img);
     }
   }
 
-  const sobreTexts = document.querySelectorAll('.sobre-text p');
+  const sobreTexts = document.querySelectorAll('.sobre-text');
   if (sobreTexts[0] && cfg.sobre.text1) sobreTexts[0].textContent = cfg.sobre.text1;
   if (sobreTexts[1] && cfg.sobre.text2) sobreTexts[1].textContent = cfg.sobre.text2;
 
