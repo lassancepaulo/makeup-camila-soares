@@ -109,9 +109,24 @@ function applySiteConfig() {
     }
   }
 
-  const sobreTexts = document.querySelectorAll('.sobre-text');
-  if (sobreTexts[0] && cfg.sobre.text1) sobreTexts[0].textContent = cfg.sobre.text1;
-  if (sobreTexts[1] && cfg.sobre.text2) sobreTexts[1].textContent = cfg.sobre.text2;
+  // Texto do Sobre: substitui todos os .sobre-text pelo conteúdo salvo (separa por \n\n em parágrafos)
+  if (cfg.sobre.text1) {
+    const sobreContent = document.querySelector('.sobre-content');
+    const existingTexts = document.querySelectorAll('.sobre-text');
+    if (sobreContent && existingTexts.length) {
+      // Remove parágrafos antigos
+      existingTexts.forEach(el => el.remove());
+      // Insere novos parágrafos antes de .sobre-certs
+      const certs = sobreContent.querySelector('.sobre-certs');
+      const paras = cfg.sobre.text1.split(/\n\n+/).filter(t => t.trim());
+      paras.forEach(function(t) {
+        const p = document.createElement('p');
+        p.className = 'sobre-text';
+        p.textContent = t.trim();
+        sobreContent.insertBefore(p, certs);
+      });
+    }
+  }
 
   // ---- CONTATO ----
   const wppNum = cfg.contato.whatsapp.replace(/\D/g, '');
