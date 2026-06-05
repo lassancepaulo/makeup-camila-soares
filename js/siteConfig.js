@@ -109,23 +109,14 @@ function applySiteConfig() {
     }
   }
 
-  // Texto do Sobre: substitui parágrafos pelo conteúdo salvo (separa por \n\n)
+  // Texto do Sobre: substitui innerHTML do #sobre-bio (separa por \n\n em parágrafos)
   if (cfg.sobre.text1) {
-    const sobreContent = document.querySelector('.sobre-content');
-    if (sobreContent) {
-      const existingTexts = Array.from(sobreContent.querySelectorAll('.sobre-text'));
-      const certs = sobreContent.querySelector('.sobre-certs');
-      const paras = cfg.sobre.text1.split(/\n\n+/).map(function(t) { return t.trim(); }).filter(Boolean);
-      if (existingTexts.length && paras.length) {
-        existingTexts.forEach(function(el) { el.remove(); });
-        paras.forEach(function(t) {
-          var p = document.createElement('p');
-          p.className = 'sobre-text';
-          p.textContent = t;
-          if (certs) sobreContent.insertBefore(p, certs);
-          else sobreContent.appendChild(p);
-        });
-      }
+    var bio = document.getElementById('sobre-bio');
+    if (bio) {
+      var paras = cfg.sobre.text1.split(/\n\n+/).map(function(t) { return t.trim(); }).filter(Boolean);
+      bio.innerHTML = paras.map(function(t) {
+        return '<p class="sobre-text">' + _escHtml(t) + '</p>';
+      }).join('');
     }
   }
 
