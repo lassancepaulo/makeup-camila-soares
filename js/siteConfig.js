@@ -191,22 +191,41 @@ function applySiteConfig() {
     }
   }
 
-  // ---- PORTFOLIO / BEHOLD ----
-  const feedId = cfg.portfolio && cfg.portfolio.beholdFeedId;
-  const beholdContainer = document.getElementById('behold-feed-container');
-  const portfolioGrid   = document.getElementById('portfolioGrid');
-  const portfolioFilter = document.querySelector('.portfolio-filter');
+  // ---- PORTFOLIO / BEHOLD / IMAGENS ----
+  var feedId          = cfg.portfolio && cfg.portfolio.beholdFeedId;
+  var portImages      = cfg.portfolio && Array.isArray(cfg.portfolio.images) ? cfg.portfolio.images : [];
+  var beholdContainer = document.getElementById('behold-feed-container');
+  var portfolioGrid   = document.getElementById('portfolioGrid');
+  var portfolioFilter = document.querySelector('.portfolio-filter');
 
   if (feedId) {
-    // Oculta grid de placeholders
+    // Modo Behold: oculta grid estático e mostra widget
     if (portfolioGrid)   portfolioGrid.style.display   = 'none';
     if (portfolioFilter) portfolioFilter.style.display = 'none';
-    // Insere widget com feed-id correto (custom element já registrado pelo script do <head>)
     if (beholdContainer) {
       beholdContainer.style.display = 'block';
       beholdContainer.innerHTML = '<behold-widget feed-id="' + feedId + '"></behold-widget>';
     }
+  } else if (portImages.length > 0) {
+    // Modo upload: renderiza fotos enviadas pelo admin
+    if (beholdContainer) beholdContainer.style.display = 'none';
+    if (portfolioFilter) portfolioFilter.style.display = '';
+    if (portfolioGrid) {
+      portfolioGrid.style.display = '';
+      portfolioGrid.innerHTML = portImages.map(function(img) {
+        return '<div class="portfolio-item" data-category="' + _escHtml(img.category || 'all') + '" data-aos>'
+          + '<div class="portfolio-img">'
+          + '<img src="' + _escHtml(img.url) + '" alt="' + _escHtml(img.title || 'Portfolio') + '" loading="lazy" style="width:100%;height:100%;object-fit:cover" />'
+          + '</div>'
+          + '<div class="portfolio-overlay">'
+          + '<span class="portfolio-cat">' + _escHtml(_catLabel(img.category)) + '</span>'
+          + '<h4>' + _escHtml(img.title || '') + '</h4>'
+          + '<button class="portfolio-zoom"><i class="fas fa-search-plus"></i></button>'
+          + '</div></div>';
+      }).join('');
+    }
   } else {
+    // Modo placeholder: mostra grid estático padrão do HTML
     if (beholdContainer) beholdContainer.style.display = 'none';
     if (portfolioGrid)   portfolioGrid.style.display   = '';
     if (portfolioFilter) portfolioFilter.style.display = '';
@@ -222,6 +241,11 @@ function _setText(sel, val) {
 
 function _escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function _catLabel(cat) {
+  var labels = { noiva: 'Noiva', formatura: 'Formatura', editorial: 'Editorial', social: 'Social', madrinhas: 'Madrinhas' };
+  return labels[cat] || cat || '';
 }
 
 function _formatPhone(num) {

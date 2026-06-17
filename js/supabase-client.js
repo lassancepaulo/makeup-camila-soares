@@ -86,5 +86,35 @@ window.DB = {
   // Pré-carrega múltiplas entidades em paralelo
   async prefetchAll(keys) {
     await Promise.all(keys.map(k => this.prefetch(k)));
+  },
+
+  // Faz upload de imagem para o bucket 'portfolio' do Supabase Storage
+  async uploadPortfolioImage(file) {
+    try {
+      const ext = file.name.split('.').pop();
+      const path = Date.now() + '_' + Math.random().toString(36).slice(2) + '.' + ext;
+      const { error } = await window.SUPABASE.storage
+        .from('portfolio')
+        .upload(path, file, { contentType: file.type });
+      if (error) throw error;
+      const { data } = window.SUPABASE.storage.from('portfolio').getPublicUrl(path);
+      return data.publicUrl;
+    } catch (e) {
+      console.warn('[DB] uploadPortfolioImage falhou:', e);
+      return null;
+    }
+  },
+
+  // Remove imagem do bucket 'portfolio' pelo URL público
+  async deletePortfolioImage(publicUrl) {
+    try {
+      const marker = '/object/public/portfolio/';
+      const idx = publicUrl.indexOf(marker);
+      if (idx === -1) return;
+      const path = publicUrl.slice(idx + marker.length);
+      await window.SUPABASE.storage.from('portfolio').remove([path]);
+    } catch (e) {
+      console.warn('[DB] deletePortfolioImage falhou:', e);
+    }
   }
 };

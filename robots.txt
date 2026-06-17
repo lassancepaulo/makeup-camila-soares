@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Bloqueia área administrativa
+Disallow: /admin/
+Disallow: /admin-login.html
+
+# Sitemap
+Sitemap: https://makeupcamilasoares.com.br/sitemap.xml
