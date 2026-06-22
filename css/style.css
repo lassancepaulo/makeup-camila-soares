@@ -1673,3 +1673,128 @@ a.contato-item:hover {
   .portfolio-grid { grid-template-columns: 1fr; }
   .hero-stats { flex-direction: column; gap: 12px; }
 }
+
+/* ====================================================
+   HOME BANNER / GIF / VIDEO
+   ==================================================== */
+.home-banner {
+  position: relative;
+  min-height: 300px;
+  overflow: hidden;
+  background: linear-gradient(-45deg, #2A1414, #4A1F1F, #7B3F3F, #3D1E1E);
+  background-size: 400% 400%;
+  animation: gradShift 10s ease infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@keyframes gradShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.banner-anim-bg { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.bubble { position: absolute; border-radius: 50%; opacity: .08; animation: floatBubble linear infinite; }
+.bubble.b1 { width: 300px; height: 300px; background: #F07272; left: -6%; top: -80px; animation-duration: 14s; }
+.bubble.b2 { width: 200px; height: 200px; background: #C9956C; left: 42%; bottom: -70px; animation-duration: 10s; animation-delay: -4s; }
+.bubble.b3 { width: 240px; height: 240px; background: #fff;    right: -5%; top: 5%;   animation-duration: 18s; animation-delay: -8s; }
+@keyframes floatBubble {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%       { transform: translateY(-28px) scale(1.06); }
+}
+.banner-media-wrap {
+  position: absolute;
+  inset: 0;
+}
+.banner-media-wrap img,
+.banner-media-wrap video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.banner-media-wrap iframe { width: 100%; height: 100%; border: 0; }
+.banner-default-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: #fff;
+  padding: 48px 24px;
+  animation: fadeInUp .9s ease both;
+}
+.banner-quote {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.2rem, 4vw, 2rem);
+  font-style: italic;
+  margin-bottom: 20px;
+  text-shadow: 0 2px 20px rgba(0,0,0,.4);
+  letter-spacing: .02em;
+}
+.banner-hashtags { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; animation: fadeInUp .9s ease .15s both; }
+.banner-hashtags span {
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.2);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 24px;
+  padding: 5px 16px;
+  font-size: .85rem;
+  color: rgba(255,255,255,.9);
+  transition: background .25s;
+  cursor: default;
+}
+.banner-hashtags span:hover { background: rgba(255,255,255,.24); }
+
+/* ====================================================
+   SERVICE PAGE GALLERY
+   ==================================================== */
+.sp-gallery-wrap { background: #fff; }
+.sp-gallery-wrap .sp-gallery-head { margin-bottom: 24px; }
+.sp-gallery-wrap h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 3vw, 2rem); color: #3D1E1E; margin-bottom: 8px; }
+.sp-gallery-wrap > .container > p { color: #777; font-size: .96rem; margin-bottom: 28px; }
+
+.svc-media-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+.sg-card {
+  border-radius: 14px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: #f5f0f5;
+  position: relative;
+}
+.sg-card img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .45s cubic-bezier(.25,.46,.45,.94);
+}
+.sg-card:hover img { transform: scale(1.07); }
+.sg-video-card {
+  border-radius: 14px;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  grid-column: 1 / -1;
+  background: #000;
+}
+.sg-video-card iframe,
+.sg-video-card video { width: 100%; height: 100%; border: 0; object-fit: cover; display: block; }
+.sg-placeholder {
+  background: linear-gradient(135deg, #FDF2F8, #EDE0F5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 160px;
+}
+.sg-placeholder i { font-size: 1.8rem; color: #D4A0C8; opacity: .5; }
+.sg-placeholder span { font-size: .8rem; color: #bbb; font-style: italic; }
+
+@media (max-width: 768px) { .svc-media-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .svc-media-grid { grid-template-columns: 1fr; } }
+
+/* ====================================================
+   SHARED KEYFRAMES
+   ==================================================== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

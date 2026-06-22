@@ -16,7 +16,11 @@ const mime = {
 http.createServer((req, res) => {
   let urlPath = req.url === '/' ? '/index.html' : req.url;
   urlPath = urlPath.split('?')[0];
-  const fp = path.join(root, urlPath);
+  let fp = path.join(root, urlPath);
+  // try adding .html for extensionless routes (e.g. /noiva → noiva.html)
+  if (!fs.existsSync(fp) && path.extname(fp) === '') {
+    fp = fp + '.html';
+  }
   if (!fs.existsSync(fp)) {
     res.writeHead(404);
     return res.end('Not found');
