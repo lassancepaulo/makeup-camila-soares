@@ -282,6 +282,46 @@ section { padding: 100px 0; }
   box-shadow: 0 6px 20px rgba(240,114,114,.5);
 }
 
+/* ---- Dropdown Serviços ---- */
+.nav-has-dd { position: relative; }
+.nav-dd {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  min-width: 210px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 10px 32px rgba(0,0,0,.14);
+  padding: 6px 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .2s ease, transform .2s ease;
+  z-index: 200;
+}
+.nav-has-dd:hover .nav-dd,
+.nav-has-dd.open .nav-dd {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+.nav-dd-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 18px;
+  color: var(--text);
+  font-size: .88rem;
+  font-weight: 500;
+  transition: background .15s, color .15s;
+  white-space: nowrap;
+}
+.nav-dd-link:hover { background: var(--cream-light); color: var(--rose-gold); }
+.nav-dd-link i { width: 16px; color: var(--rose-gold); font-size: .82rem; }
+.nav-chevron { font-size: .58rem; margin-left: 3px; transition: transform .2s; vertical-align: middle; }
+.nav-has-dd:hover .nav-chevron,
+.nav-has-dd.open .nav-chevron { transform: rotate(180deg); }
+
 .nav-toggle {
   display: none;
   flex-direction: column;
@@ -1635,6 +1675,26 @@ a.contato-item:hover {
   .nav-cta { margin-top: 8px; }
 
   .nav-toggle { display: flex; z-index: 1000; }
+
+  /* Dropdown mobile — expande inline */
+  .nav-has-dd { width: 100%; }
+  .nav-has-dd .nav-dd {
+    position: static;
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    max-height: 0;
+    overflow: hidden;
+    box-shadow: none;
+    border-radius: 10px;
+    background: rgba(255,255,255,.08);
+    padding: 0;
+    transition: max-height .28s ease, padding .28s ease;
+  }
+  .nav-has-dd.open .nav-dd { max-height: 220px; padding: 4px 0; }
+  .nav-dd-link { color: rgba(255,255,255,.9) !important; padding: 10px 32px; }
+  .nav-dd-link:hover { background: rgba(255,255,255,.1) !important; color: #fff !important; }
+  .nav-dd-link i { color: rgba(255,220,230,.7) !important; }
 
   .hero-buttons { flex-direction: column; align-items: center; }
   .hero-stats { gap: 24px; }

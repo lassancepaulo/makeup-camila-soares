@@ -18,11 +18,27 @@ navToggle?.addEventListener('click', () => {
   document.body.style.overflow = navLinks.classList.contains('open') ? 'hidden' : '';
 });
 
-document.querySelectorAll('.nav-link').forEach(link => {
+document.querySelectorAll('.nav-link:not(.nav-dd-toggle)').forEach(link => {
   link.addEventListener('click', () => {
     navLinks.classList.remove('open');
     document.body.style.overflow = '';
   });
+});
+
+// Dropdown toggle
+document.querySelectorAll('.nav-dd-toggle').forEach(toggle => {
+  toggle.addEventListener('click', e => {
+    e.preventDefault();
+    const li = toggle.closest('.nav-has-dd');
+    const wasOpen = li.classList.contains('open');
+    document.querySelectorAll('.nav-has-dd').forEach(el => el.classList.remove('open'));
+    if (!wasOpen) li.classList.add('open');
+  });
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('.nav-has-dd')) {
+    document.querySelectorAll('.nav-has-dd').forEach(el => el.classList.remove('open'));
+  }
 });
 
 // ---------- SCROLL ANIMATIONS ----------
