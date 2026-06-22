@@ -308,6 +308,15 @@ section { padding: 100px 0; }
     z-index: 300;
     animation: ddFadeIn .16s ease;
   }
+  /* Ponte invisível que cobre o gap de 8px impedindo que o hover se perca */
+  .nav-dd::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 0;
+    right: 0;
+    height: 8px;
+  }
   .nav-has-dd:hover .nav-dd,
   .nav-has-dd.open .nav-dd { display: block; }
   .nav-dd-link { padding: 11px 18px; color: var(--text); }
