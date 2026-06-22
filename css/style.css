@@ -1762,30 +1762,31 @@ a.contato-item:hover {
   animation: floatMkp ease-in-out infinite;
   filter: drop-shadow(0 2px 8px rgba(0,0,0,.10));
   stroke: none;
+  overflow: hidden;
 }
 @keyframes floatMkp {
-  0%,100% { transform: translateY(0) rotate(var(--r0, 0deg)); }
-  50%      { transform: translateY(var(--ty, -18px)) rotate(var(--r1, 0deg)); }
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-18px); }
 }
-.mkp-f1  { width:46px;  left:4%;   top:-6%;    animation-duration:13s;                    --r0:-5deg;  --r1:3deg;  }
-.mkp-f2  { width:30px;  right:20%; top:2%;     animation-duration:10s; animation-delay:-4s;  --r0:22deg;  --r1:30deg; --ty:-14px; }
-.mkp-f3  { width:36px;  left:26%;  bottom:-8%; animation-duration:15s; animation-delay:-7s;  --r0:-20deg; --r1:-12deg; }
-.mkp-f4  { width:52px;  right:7%;  top:10%;    animation-duration:11s; animation-delay:-2s;  --ty:-16px; }
-.mkp-f5  { width:30px;  left:16%;  top:58%;    animation-duration:9s;  animation-delay:-5s;  --ty:-13px; }
-.mkp-f6  { width:20px;  left:54%;  top:5%;     animation-duration:8s;  animation-delay:-1s;  --ty:-10px; }
-.mkp-f7  { width:16px;  right:36%; bottom:9%;  animation-duration:12s; animation-delay:-8s;  --ty:-9px;  }
-.mkp-f8  { width:13px;  left:38%;  top:62%;    animation-duration:7s;  animation-delay:-3s;  --ty:-7px;  fill:rgba(255,200,220,.18); }
-.mkp-f9  { width:54px;  right:5%;  top:4%;     animation-duration:14s; animation-delay:-6s;  --r0:-4deg;  --r1:4deg;  }
-.mkp-f10 { width:34px;  left:11%;  top:42%;    animation-duration:17s; animation-delay:-3s;  --r0:-3deg;  --r1:5deg;  }
-.mkp-f11 { width:46px;  left:3%;   bottom:4%;  animation-duration:12s; animation-delay:-9s;  --r0:-8deg;  --r1:8deg;  }
-.mkp-f12 { width:64px;  left:41%;  top:-5%;    animation-duration:18s; animation-delay:-2s;  --ty:-16px; --r0:-2deg; --r1:4deg; }
-.mkp-f13 { width:68px;  right:16%; bottom:9%;  animation-duration:14s; animation-delay:-7s;  --r0:-4deg;  --r1:4deg;  }
-.mkp-f14 { width:22px;  left:33%;  top:58%;    animation-duration:5s;  animation-delay:0s;   --ty:-11px; fill:rgba(255,255,255,.20); }
-.mkp-f15 { width:16px;  right:17%; top:36%;    animation-duration:4s;  animation-delay:-2s;  --ty:-9px;  fill:rgba(255,255,255,.20); }
-.mkp-f16 { width:13px;  left:69%;  bottom:17%; animation-duration:6s;  animation-delay:-4s;  --ty:-7px;  fill:rgba(255,255,255,.20); }
-.mkp-f17 { width:10px;  left:8%;   top:32%;    animation-duration:3.5s;animation-delay:-1s;  --ty:-6px;  fill:rgba(255,255,255,.20); }
-.mkp-f18 { width:25px;  right:12%; bottom:7%;  animation-duration:17s; animation-delay:-8s;  --r0:10deg;  --r1:18deg; }
-.mkp-f19 { width:42px;  left:80%;  bottom:6%;  animation-duration:13s; animation-delay:-5s;  --r0:6deg;   --r1:14deg; }
+.mkp-f1  { width:46px;  left:4%;   top:2%;     animation-duration:13s; }
+.mkp-f2  { width:30px;  right:20%; top:5%;     animation-duration:10s; animation-delay:-4s; }
+.mkp-f3  { width:36px;  left:26%;  bottom:2%;  animation-duration:15s; animation-delay:-7s; }
+.mkp-f4  { width:52px;  right:7%;  top:10%;    animation-duration:11s; animation-delay:-2s; }
+.mkp-f5  { width:30px;  left:16%;  top:55%;    animation-duration:9s;  animation-delay:-5s; }
+.mkp-f6  { width:20px;  left:54%;  top:8%;     animation-duration:8s;  animation-delay:-1s; }
+.mkp-f7  { width:16px;  right:36%; bottom:12%; animation-duration:12s; animation-delay:-8s; }
+.mkp-f8  { width:13px;  left:38%;  top:60%;    animation-duration:7s;  animation-delay:-3s; fill:rgba(255,200,220,.20); }
+.mkp-f9  { width:54px;  right:5%;  top:6%;     animation-duration:14s; animation-delay:-6s; }
+.mkp-f10 { width:34px;  left:11%;  top:40%;    animation-duration:17s; animation-delay:-3s; }
+.mkp-f11 { width:46px;  left:3%;   bottom:6%;  animation-duration:12s; animation-delay:-9s; }
+.mkp-f12 { width:64px;  left:41%;  top:2%;     animation-duration:18s; animation-delay:-2s; }
+.mkp-f13 { width:68px;  right:16%; bottom:5%;  animation-duration:14s; animation-delay:-7s; }
+.mkp-f14 { width:22px;  left:33%;  top:55%;    animation-duration:5s;  animation-delay:0s;  fill:rgba(255,255,255,.22); }
+.mkp-f15 { width:16px;  right:17%; top:35%;    animation-duration:4s;  animation-delay:-2s; fill:rgba(255,255,255,.22); }
+.mkp-f16 { width:13px;  left:69%;  bottom:20%; animation-duration:6s;  animation-delay:-4s; fill:rgba(255,255,255,.22); }
+.mkp-f17 { width:10px;  left:8%;   top:30%;    animation-duration:3.5s;animation-delay:-1s; fill:rgba(255,255,255,.22); }
+.mkp-f18 { width:25px;  right:12%; bottom:8%;  animation-duration:17s; animation-delay:-8s; }
+.mkp-f19 { width:42px;  left:80%;  bottom:8%;  animation-duration:13s; animation-delay:-5s; }
 .banner-media-wrap {
   position: absolute;
   inset: 0;
