@@ -1694,13 +1694,25 @@ a.contato-item:hover {
   100% { background-position: 0% 50%; }
 }
 .banner-anim-bg { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-.bubble { position: absolute; border-radius: 50%; opacity: .08; animation: floatBubble linear infinite; }
-.bubble.b1 { width: 300px; height: 300px; background: #F07272; left: -6%; top: -80px; animation-duration: 14s; }
-.bubble.b2 { width: 200px; height: 200px; background: #C9956C; left: 42%; bottom: -70px; animation-duration: 10s; animation-delay: -4s; }
-.bubble.b3 { width: 240px; height: 240px; background: #fff;    right: -5%; top: 5%;   animation-duration: 18s; animation-delay: -8s; }
-@keyframes floatBubble {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50%       { transform: translateY(-28px) scale(1.06); }
+
+/* Makeup floating silhouettes */
+.mkp-float {
+  position: absolute;
+  fill: rgba(255,255,255,.13);
+  animation: floatMkp ease-in-out infinite;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,.15));
+}
+.mkp-lipstick  { width: 52px;  left: 6%;   top: -8%;  animation-duration: 13s; }
+.mkp-brush     { width: 28px;  right: 10%; top: 4%;   animation-duration: 16s; animation-delay: -6s; transform: rotate(15deg); }
+.mkp-palette   { width: 100px; left: 34%;  bottom: -12%; animation-duration: 11s; animation-delay: -3s; }
+.mkp-mascara   { width: 26px;  right: 28%; top: -10%; animation-duration: 19s; animation-delay: -9s; transform: rotate(-8deg); }
+.mkp-compact   { width: 68px;  left: 18%;  bottom: 5%; animation-duration: 14s; animation-delay: -5s; }
+.mkp-mirror    { width: 44px;  right: 5%;  bottom: 8%; animation-duration: 12s; animation-delay: -2s; transform: rotate(12deg); }
+
+@keyframes floatMkp {
+  0%   { transform: translateY(0)     rotate(var(--rot-start, -4deg)); }
+  50%  { transform: translateY(-22px) rotate(var(--rot-end,   4deg)); }
+  100% { transform: translateY(0)     rotate(var(--rot-start, -4deg)); }
 }
 .banner-media-wrap {
   position: absolute;
