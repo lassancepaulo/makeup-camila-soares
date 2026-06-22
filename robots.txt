@@ -6,4 +6,4 @@ Disallow: /admin/
 Disallow: /admin-login.html
 
 # Sitemap
-Sitemap: https://makeupcamilasoares.com.br/sitemap.xml
+Sitemap: https://makeupcamilasoares.com/sitemap.xml
