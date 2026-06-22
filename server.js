@@ -17,6 +17,10 @@ http.createServer((req, res) => {
   let urlPath = req.url === '/' ? '/index.html' : req.url;
   urlPath = urlPath.split('?')[0];
   let fp = path.join(root, urlPath);
+  // /blog/slug → blog-post.html
+  if (!fs.existsSync(fp) && urlPath.startsWith('/blog/') && path.extname(fp) === '') {
+    fp = path.join(root, 'blog-post.html');
+  }
   // try adding .html for extensionless routes (e.g. /noiva → noiva.html)
   if (!fs.existsSync(fp) && path.extname(fp) === '') {
     fp = fp + '.html';

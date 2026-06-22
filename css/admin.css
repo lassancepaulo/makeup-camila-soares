@@ -1001,6 +1001,13 @@ input, select, textarea { font-family: inherit; }
 .btn-danger-admin:hover {
   background: #FECACA;
 }
+.btn-icon-admin {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 8px; border: 1.5px solid rgba(201,149,108,.25);
+  background: transparent; color: var(--text-secondary); font-size: .88rem;
+  cursor: pointer; text-decoration: none; transition: all .18s;
+}
+.btn-icon-admin:hover { background: var(--cream-light, #fdf6ef); color: var(--rose-gold, #c9956c); border-color: var(--rose-gold, #c9956c); }
 
 /* ---------- FILTER BAR ---------- */
 .filter-bar {

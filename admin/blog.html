@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog — Admin | Makeup Camila Soares</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/jpeg" href="../assets/logo-black.png" />
+  <style>
+    .blog-admin-wrap { padding: 28px; }
+    .blog-admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 14px; }
+    .blog-admin-header h2 { font-family: var(--font-heading); font-size: 1.5rem; color: var(--text); }
+    .posts-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+    .post-item {
+      background: #fff; border-radius: 14px; border: 1px solid rgba(201,149,108,.15);
+      padding: 16px 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    .post-item-img {
+      width: 72px; height: 48px; border-radius: 8px; object-fit: cover;
+      background: var(--cream-light); flex-shrink: 0;
+    }
+    .post-item-img-placeholder { width: 72px; height: 48px; border-radius: 8px; background: var(--cream-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .post-item-img-placeholder i { color: rgba(201,149,108,.4); font-size: 1.1rem; }
+    .post-item-info { flex: 1; min-width: 0; }
+    .post-item-title { font-weight: 600; font-size: .94rem; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .post-item-meta { font-size: .78rem; color: var(--text-light); display: flex; gap: 14px; flex-wrap: wrap; }
+    .cat-badge { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; padding: 2px 8px; border-radius: 10px; }
+    .cat-noiva     { background: #fce7f3; color: #be185d; }
+    .cat-tendencias{ background: #ede9fe; color: #7c3aed; }
+    .cat-dicas     { background: #d1fae5; color: #065f46; }
+    .cat-bastidores{ background: #fef3c7; color: #92400e; }
+    .post-item-actions { display: flex; gap: 8px; }
+    .post-badge-status { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; padding: 3px 10px; border-radius: 10px; }
+    .post-badge-pub  { background: #d1fae5; color: #065f46; }
+    .post-badge-draft{ background: #fef3c7; color: #92400e; }
+
+    /* Form editor */
+    .post-editor-overlay {
+      position: fixed; inset: 0; background: rgba(20,8,8,.55); z-index: 900;
+      display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .post-editor-overlay.open { display: flex; }
+    .post-editor-box {
+      background: #fff; border-radius: 20px; width: 100%; max-width: 720px;
+      max-height: 90vh; overflow-y: auto; padding: 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18);
+    }
+    .editor-box-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .editor-box-header h3 { font-family: var(--font-heading); font-size: 1.3rem; color: var(--text); }
+    .editor-close-btn { background: none; border: none; font-size: 1.3rem; color: var(--text-light); cursor: pointer; padding: 4px 8px; border-radius: 8px; }
+    .editor-close-btn:hover { background: var(--cream-light); color: var(--text); }
+    .editor-field { margin-bottom: 16px; }
+    .editor-field label { display: block; font-size: .82rem; font-weight: 600; color: var(--text-light); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .06em; }
+    .editor-field input, .editor-field select, .editor-field textarea {
+      width: 100%; padding: 10px 14px; border: 1.5px solid rgba(201,149,108,.25);
+      border-radius: 10px; font-size: .92rem; font-family: var(--font-body);
+      background: #fff; color: var(--text); transition: border-color .2s;
+    }
+    .editor-field input:focus, .editor-field select:focus, .editor-field textarea:focus {
+      outline: none; border-color: var(--rose-gold);
+    }
+    .editor-field textarea { min-height: 220px; resize: vertical; }
+    .editor-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media(max-width:560px) { .editor-field-row { grid-template-columns: 1fr; } }
+    .editor-publish-row { display: flex; align-items: center; gap: 12px; margin-top: 20px; }
+    .editor-field-hint { font-size: .76rem; color: var(--text-light); margin-top: 4px; }
+    .empty-posts { text-align: center; padding: 50px 20px; color: var(--text-light); }
+    .empty-posts i { font-size: 2.5rem; color: rgba(201,149,108,.3); margin-bottom: 12px; display: block; }
+    .content-help {
+      font-size: .78rem; color: var(--text-light); background: var(--cream-light);
+      border-radius: 8px; padding: 10px 14px; margin-top: 6px; line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<div class="admin-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="../assets/logo-brand-white.png" class="sidebar-logo-img" alt="Makeup Camila Soares" />
+      <span class="sidebar-logo-admin">Painel Administrativo</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Principal</div>
+      <a href="index.html"          class="sidebar-link"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="agenda.html"         class="sidebar-link"><i class="fas fa-calendar-week"></i> Agenda</a>
+      <a href="agendamentos.html"   class="sidebar-link"><i class="fas fa-calendar-check"></i> Agendamentos</a>
+      <a href="clientes.html"       class="sidebar-link"><i class="fas fa-address-book"></i> Clientes</a>
+      <a href="orcamentos.html"     class="sidebar-link"><i class="fas fa-file-invoice"></i> Orçamentos</a>
+      <a href="orcamento-novo.html" class="sidebar-link"><i class="fas fa-plus-circle"></i> Novo Orçamento</a>
+      <a href="pipeline.html"       class="sidebar-link"><i class="fas fa-project-diagram"></i> Pipeline</a>
+      <div class="nav-section-title" style="margin-top:8px">Financeiro</div>
+      <a href="faturamento.html"    class="sidebar-link"><i class="fas fa-chart-bar"></i> Faturamento</a>
+      <div class="nav-section-title" style="margin-top:8px">Operacional</div>
+      <a href="estoque.html"        class="sidebar-link"><i class="fas fa-boxes"></i> Estoque <span id="estoqueBadge" class="sidebar-badge" style="display:none"></span></a>
+      <div class="nav-section-title" style="margin-top:8px">Site</div>
+      <a href="site-editor.html"    class="sidebar-link"><i class="fas fa-paint-brush"></i> Editor do Site</a>
+      <a href="blog.html"           class="sidebar-link active"><i class="fas fa-feather-alt"></i> Blog</a>
+      <a href="../index.html"       class="sidebar-link" target="_blank"><i class="fas fa-external-link-alt"></i> Ver site</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar"><i class="fas fa-user"></i></div>
+        <div class="sidebar-user-info">
+          <strong>Camila Soares</strong>
+          <span>Administrador</span>
+        </div>
+      </div>
+      <a href="../admin-login.html" class="sidebar-logout" onclick="logout(event)">
+        <i class="fas fa-sign-out-alt"></i> Sair
+      </a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <button class="sidebar-toggle" id="sidebarToggle" aria-label="Menu">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div>
+        <h1 class="page-title">Blog</h1>
+        <p class="page-subtitle">Gerencie os posts publicados no blog do site</p>
+      </div>
+    </header>
+
+    <div class="page-content blog-admin-wrap">
+      <div class="blog-admin-header">
+        <h2><i class="fas fa-feather-alt" style="color:var(--rose-gold)"></i> Posts</h2>
+        <button class="btn-primary-admin" onclick="openEditor(null)">
+          <i class="fas fa-plus"></i> Novo Post
+        </button>
+      </div>
+
+      <div class="posts-list" id="postsList"></div>
+    </div>
+  </main>
+</div>
+
+<!-- Editor overlay -->
+<div class="post-editor-overlay" id="editorOverlay">
+  <div class="post-editor-box">
+    <div class="editor-box-header">
+      <h3 id="editorTitle">Novo Post</h3>
+      <button class="editor-close-btn" onclick="closeEditor()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="editor-field-row">
+      <div class="editor-field">
+        <label>Categoria</label>
+        <select id="post_cat">
+          <option value="noiva">Noiva</option>
+          <option value="tendencias">Tendências</option>
+          <option value="dicas">Dicas</option>
+          <option value="bastidores">Bastidores</option>
+        </select>
+      </div>
+      <div class="editor-field">
+        <label>Data de publicação</label>
+        <input type="date" id="post_date" />
+      </div>
+    </div>
+
+    <div class="editor-field">
+      <label>Título</label>
+      <input type="text" id="post_title" placeholder="Ex: 5 dicas para a make de noiva durar o dia todo" oninput="autoSlug()" />
+    </div>
+
+    <div class="editor-field">
+      <label>URL do post (slug)</label>
+      <input type="text" id="post_slug" placeholder="5-dicas-make-noiva-durar-dia-todo" />
+      <div class="editor-field-hint">Gerado automaticamente. Use apenas letras minúsculas, números e hífens.</div>
+    </div>
+
+    <div class="editor-field">
+      <label>Resumo (excerpt)</label>
+      <input type="text" id="post_excerpt" placeholder="Breve descrição que aparece na listagem do blog..." />
+    </div>
+
+    <div class="editor-field">
+      <label>URL da imagem de capa</label>
+      <input type="url" id="post_cover" placeholder="https://..." />
+    </div>
+
+    <div class="editor-field">
+      <label>Conteúdo (HTML)</label>
+      <textarea id="post_content" placeholder="<p>Seu texto aqui...</p>&#10;<h2>Subtítulo</h2>&#10;<p>Mais texto...</p>"></textarea>
+      <div class="content-help">
+        Suporte a HTML básico: &lt;p&gt;, &lt;h2&gt;, &lt;h3&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;img src="..."&gt;, &lt;blockquote&gt;
+      </div>
+    </div>
+
+    <div class="editor-publish-row">
+      <label class="toggle-switch" style="position:relative;display:inline-block;width:46px;height:26px;flex-shrink:0">
+        <input type="checkbox" id="post_published" />
+        <span style="position:absolute;cursor:pointer;inset:0;background:#d1d5db;border-radius:26px;transition:background .2s" id="toggleSlider">
+          <span style="position:absolute;height:20px;width:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:transform .2s" id="toggleKnob"></span>
+        </span>
+      </label>
+      <span style="font-size:.9rem;font-weight:500;color:var(--text)">Publicar imediatamente</span>
+    </div>
+
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;flex-wrap:wrap">
+      <button class="btn-secondary-admin" onclick="closeEditor()">Cancelar</button>
+      <button id="deletePostBtn" class="btn-danger-admin" onclick="deleteCurrentPost()" style="display:none"><i class="fas fa-trash"></i> Excluir</button>
+      <button class="btn-primary-admin" onclick="savePost()"><i class="fas fa-save"></i> Salvar Post</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg">Salvo!</span></div>
+
+<script src="../js/supabase-client.js"></script>
+<script src="../js/admin.js"></script>
+<script>
+'use strict';
+requireAuth();
+initEstoqueBadge();
+
+const CFG_KEY = 'camilaSiteConfig';
+let posts = [];
+let editingId = null;
+
+function readCfg() { try { return JSON.parse(localStorage.getItem(CFG_KEY) || '{}'); } catch { return {}; } }
+function writeCfg(cfg) { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); if (window.DB) DB.setConfig('siteConfig', cfg); }
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+function slugify(str) {
+  return str.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim().replace(/\s+/g, '-').replace(/-+/g, '-');
+}
+
+function autoSlug() {
+  if (editingId) return;
+  document.getElementById('post_slug').value = slugify(document.getElementById('post_title').value);
+}
+
+function formatDate(d) {
+  if (!d) return '—';
+  var parts = d.split('-');
+  return parts.length === 3 ? parts[2] + '/' + parts[1] + '/' + parts[0] : d;
+}
+
+const catLabels = {
+  noiva:      { label: 'Noiva',      cls: 'cat-noiva' },
+  tendencias: { label: 'Tendências', cls: 'cat-tendencias' },
+  dicas:      { label: 'Dicas',      cls: 'cat-dicas' },
+  bastidores: { label: 'Bastidores', cls: 'cat-bastidores' }
+};
+
+function renderList() {
+  const list = document.getElementById('postsList');
+  if (!posts.length) {
+    list.innerHTML = '<div class="empty-posts"><i class="fas fa-feather-alt"></i><p>Nenhum post ainda. Clique em "Novo Post" para começar.</p></div>';
+    return;
+  }
+  list.innerHTML = posts.map(function(p) {
+    const cat = catLabels[p.category] || { label: p.category || '', cls: '' };
+    const img = p.coverUrl
+      ? '<img class="post-item-img" src="' + p.coverUrl + '" alt="' + p.title + '" />'
+      : '<div class="post-item-img-placeholder"><i class="fas fa-image"></i></div>';
+    const badge = p.published
+      ? '<span class="post-badge-status post-badge-pub">Publicado</span>'
+      : '<span class="post-badge-status post-badge-draft">Rascunho</span>';
+    return '<div class="post-item">'
+      + img
+      + '<div class="post-item-info">'
+      + '<div class="post-item-title">' + p.title + '</div>'
+      + '<div class="post-item-meta">'
+      + '<span class="cat-badge ' + cat.cls + '">' + cat.label + '</span>'
+      + ' ' + formatDate(p.publishedAt) + ' &nbsp; ' + badge
+      + '</div></div>'
+      + '<div class="post-item-actions">'
+      + '<a href="../blog/' + p.slug + '" target="_blank" class="btn-icon-admin" title="Ver no site"><i class="fas fa-external-link-alt"></i></a>'
+      + '<button class="btn-icon-admin" title="Editar" onclick="openEditor(\'' + p.id + '\')"><i class="fas fa-edit"></i></button>'
+      + '</div></div>';
+  }).join('');
+}
+
+function openEditor(id) {
+  editingId = id;
+  const overlay = document.getElementById('editorOverlay');
+  document.getElementById('editorTitle').textContent = id ? 'Editar Post' : 'Novo Post';
+  document.getElementById('deletePostBtn').style.display = id ? 'inline-flex' : 'none';
+
+  if (id) {
+    const p = posts.find(function(x) { return x.id === id; }) || {};
+    document.getElementById('post_title').value   = p.title        || '';
+    document.getElementById('post_slug').value    = p.slug         || '';
+    document.getElementById('post_excerpt').value = p.excerpt      || '';
+    document.getElementById('post_cover').value   = p.coverUrl     || '';
+    document.getElementById('post_content').value = p.content      || '';
+    document.getElementById('post_date').value    = p.publishedAt  || '';
+    document.getElementById('post_cat').value     = p.category     || 'dicas';
+    document.getElementById('post_published').checked = !!p.published;
+  } else {
+    document.getElementById('post_title').value   = '';
+    document.getElementById('post_slug').value    = '';
+    document.getElementById('post_excerpt').value = '';
+    document.getElementById('post_cover').value   = '';
+    document.getElementById('post_content').value = '';
+    document.getElementById('post_date').value    = new Date().toISOString().split('T')[0];
+    document.getElementById('post_cat').value     = 'dicas';
+    document.getElementById('post_published').checked = false;
+  }
+  updateToggleUI();
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeEditor() {
+  document.getElementById('editorOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  editingId = null;
+}
+
+function updateToggleUI() {
+  const checked = document.getElementById('post_published').checked;
+  document.getElementById('toggleSlider').style.background = checked ? 'var(--rose-gold)' : '#d1d5db';
+  document.getElementById('toggleKnob').style.transform = checked ? 'translateX(20px)' : 'translateX(0)';
+}
+document.getElementById('post_published').addEventListener('change', updateToggleUI);
+
+function savePost() {
+  const title   = document.getElementById('post_title').value.trim();
+  const slug    = document.getElementById('post_slug').value.trim() || slugify(title);
+  const excerpt = document.getElementById('post_excerpt').value.trim();
+  const cover   = document.getElementById('post_cover').value.trim();
+  const content = document.getElementById('post_content').value.trim();
+  const date    = document.getElementById('post_date').value;
+  const cat     = document.getElementById('post_cat').value;
+  const pub     = document.getElementById('post_published').checked;
+
+  if (!title) { alert('Informe o título do post.'); return; }
+  if (!slug)  { alert('Informe o slug do post.'); return; }
+
+  if (editingId) {
+    const idx = posts.findIndex(function(p) { return p.id === editingId; });
+    if (idx !== -1) {
+      posts[idx] = Object.assign(posts[idx], { title, slug, excerpt, coverUrl: cover, content, publishedAt: date, category: cat, published: pub });
+    }
+  } else {
+    posts.unshift({ id: uid(), title, slug, excerpt, coverUrl: cover, content, publishedAt: date, category: cat, published: pub });
+  }
+
+  const cfg = readCfg();
+  cfg.blogPosts = posts;
+  writeCfg(cfg);
+  renderList();
+  closeEditor();
+  showToast('Post salvo!');
+}
+
+function deleteCurrentPost() {
+  if (!editingId) return;
+  if (!confirm('Excluir este post? Esta ação não pode ser desfeita.')) return;
+  posts = posts.filter(function(p) { return p.id !== editingId; });
+  const cfg = readCfg();
+  cfg.blogPosts = posts;
+  writeCfg(cfg);
+  renderList();
+  closeEditor();
+  showToast('Post excluído.');
+}
+
+// Close on overlay click
+document.getElementById('editorOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeEditor();
+});
+
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeEditor(); });
+
+// Init
+(async function() {
+  if (window.DB) {
+    try {
+      const remote = await window.DB.getConfig('siteConfig');
+      if (remote) localStorage.setItem(CFG_KEY, JSON.stringify(remote));
+    } catch(e) {}
+  }
+  const cfg = readCfg();
+  posts = Array.isArray(cfg.blogPosts) ? cfg.blogPosts : [];
+  renderList();
+})();
+</script>
+</body>
+</html>

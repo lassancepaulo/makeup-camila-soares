@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog de Maquiagem | Camila Soares</title>
+  <meta name="description" content="Dicas de maquiagem, tendências de beleza, looks para noiva, formatura e eventos sociais. Blog da maquiadora Camila Soares em Niterói e Rio de Janeiro." />
+  <link rel="canonical" href="https://makeupcamilasoares.com/blog" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://makeupcamilasoares.com/blog" />
+  <meta property="og:title" content="Blog de Maquiagem | Camila Soares" />
+  <meta property="og:description" content="Dicas, tendências e inspirações de beleza para noivas, formaturas e eventos sociais." />
+  <meta property="og:image" content="https://makeupcamilasoares.com/assets/camila-sobre.jpeg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" type="image/jpeg" href="assets/logo-black.png" />
+  <style>
+    /* ---- Blog listing ---- */
+    .blog-hero {
+      background: linear-gradient(-45deg, #2A1414, #4A1F1F, #7B3F3F, #3D1E1E);
+      background-size: 400% 400%;
+      animation: gradShift 10s ease infinite;
+      padding: 100px 20px 60px;
+      text-align: center;
+    }
+    .blog-hero-label {
+      display: inline-block; font-size: .72rem; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--rose-gold); background: rgba(201,149,108,.12); border: 1px solid rgba(201,149,108,.3);
+      border-radius: 20px; padding: 5px 16px; margin-bottom: 18px;
+    }
+    .blog-hero h1 { font-family: var(--font-heading); font-size: clamp(2rem,5vw,3.2rem); color: #fff; margin-bottom: 14px; }
+    .blog-hero p { color: rgba(255,255,255,.75); font-size: 1.05rem; max-width: 540px; margin: 0 auto; }
+
+    .blog-filters {
+      display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+      padding: 36px 20px 0;
+    }
+    .blog-filter-btn {
+      padding: 8px 20px; border-radius: 20px; border: 1.5px solid rgba(201,149,108,.3);
+      background: transparent; color: var(--text); font-size: .84rem; font-weight: 500;
+      cursor: pointer; transition: all .2s;
+    }
+    .blog-filter-btn.active, .blog-filter-btn:hover {
+      background: var(--rose-gold); color: #fff; border-color: var(--rose-gold);
+    }
+
+    .blog-grid-wrap { max-width: 1140px; margin: 0 auto; padding: 36px 20px 80px; }
+    .blog-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;
+    }
+    @media(max-width: 900px) { .blog-grid { grid-template-columns: repeat(2,1fr); } }
+    @media(max-width: 580px) { .blog-grid { grid-template-columns: 1fr; } }
+
+    .blog-card {
+      background: #fff; border-radius: 18px; overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,.07); transition: transform .22s, box-shadow .22s;
+      display: flex; flex-direction: column;
+    }
+    .blog-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(0,0,0,.12); }
+    .blog-card-img {
+      width: 100%; aspect-ratio: 16/9; object-fit: cover;
+      background: var(--cream-light);
+    }
+    .blog-card-img-placeholder {
+      width: 100%; aspect-ratio: 16/9;
+      background: linear-gradient(135deg, #f9f0e8, #ecdcc9);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .blog-card-img-placeholder i { font-size: 2.2rem; color: rgba(201,149,108,.4); }
+    .blog-card-body { padding: 20px 22px 22px; flex: 1; display: flex; flex-direction: column; }
+    .blog-card-cat {
+      font-size: .72rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--rose-gold); margin-bottom: 8px;
+    }
+    .blog-card-title {
+      font-family: var(--font-heading); font-size: 1.12rem; color: var(--text);
+      line-height: 1.4; margin-bottom: 10px;
+    }
+    .blog-card-excerpt {
+      font-size: .86rem; color: var(--text-light); line-height: 1.6; flex: 1; margin-bottom: 16px;
+    }
+    .blog-card-meta { display: flex; align-items: center; gap: 10px; font-size: .78rem; color: var(--text-light); }
+    .blog-card-meta i { color: var(--rose-gold); }
+    .blog-card-link {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 14px;
+      font-size: .84rem; font-weight: 600; color: var(--rose-gold);
+      text-decoration: none; transition: gap .18s;
+    }
+    .blog-card-link:hover { gap: 10px; }
+
+    .blog-empty {
+      grid-column: 1/-1; text-align: center; padding: 60px 20px;
+    }
+    .blog-empty i { font-size: 3rem; color: rgba(201,149,108,.3); margin-bottom: 16px; display: block; }
+    .blog-empty h3 { font-family: var(--font-heading); color: var(--text); margin-bottom: 8px; }
+    .blog-empty p { color: var(--text-light); font-size: .9rem; }
+
+    .cat-label { padding: 3px 10px; border-radius: 12px; font-size: .7rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+    .cat-noiva     { background: #fce7f3; color: #be185d; }
+    .cat-tendencias{ background: #ede9fe; color: #7c3aed; }
+    .cat-dicas     { background: #d1fae5; color: #065f46; }
+    .cat-bastidores{ background: #fef3c7; color: #92400e; }
+  </style>
+</head>
+<body>
+  <!-- ======== NAV ======== -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">
+        <img src="assets/logo-brand.png" alt="Makeup Camila Soares" class="nav-logo-img" />
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/#sobre" class="nav-link">Sobre</a></li>
+        <li class="nav-has-dd">
+          <a href="/#servicos" class="nav-link nav-dd-toggle">Serviços <i class="fas fa-chevron-down nav-chevron"></i></a>
+          <ul class="nav-dd">
+            <li><a href="/noiva"     class="nav-dd-link" data-page="noiva"><i class="fas fa-ring"></i> Noiva</a></li>
+            <li><a href="/formatura" class="nav-dd-link" data-page="formatura"><i class="fas fa-graduation-cap"></i> Formatura</a></li>
+            <li><a href="/social"    class="nav-dd-link" data-page="social"><i class="fas fa-calendar-alt"></i> Eventos Sociais</a></li>
+            <li><a href="/penteado"  class="nav-dd-link" data-page="penteado"><i class="fas fa-spa"></i> Penteados</a></li>
+          </ul>
+        </li>
+        <li><a href="/#portfolio" class="nav-link">Portfólio</a></li>
+        <li><a href="/#depoimentos" class="nav-link">Depoimentos</a></li>
+        <li><a href="/blog" class="nav-link active">Blog</a></li>
+        <li><a href="/#contato" class="nav-link nav-cta">Agendar horário</a></li>
+      </ul>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <!-- ======== HERO ======== -->
+  <section class="blog-hero">
+    <span class="blog-hero-label"><i class="fas fa-feather-alt"></i> Blog</span>
+    <h1>Beleza & Inspiração</h1>
+    <p>Dicas de maquiagem, tendências de beleza e bastidores do universo da make</p>
+  </section>
+
+  <!-- ======== FILTROS ======== -->
+  <div class="blog-filters" id="blogFilters">
+    <button class="blog-filter-btn active" data-cat="all">Todos</button>
+    <button class="blog-filter-btn" data-cat="noiva">Noiva</button>
+    <button class="blog-filter-btn" data-cat="tendencias">Tendências</button>
+    <button class="blog-filter-btn" data-cat="dicas">Dicas</button>
+    <button class="blog-filter-btn" data-cat="bastidores">Bastidores</button>
+  </div>
+
+  <!-- ======== GRID ======== -->
+  <div class="blog-grid-wrap">
+    <div class="blog-grid" id="blogGrid">
+      <!-- preenchido via JS -->
+    </div>
+  </div>
+
+  <!-- ======== FOOTER ======== -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <img src="assets/logo-brand-white.png" alt="Makeup Camila Soares" class="footer-logo" />
+        <p class="footer-tagline">Beleza que transforma momentos em memórias.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Serviços</h4>
+        <a href="/noiva">Noiva</a>
+        <a href="/formatura">Formatura</a>
+        <a href="/social">Eventos Sociais</a>
+        <a href="/penteado">Penteados</a>
+      </div>
+      <div class="footer-links">
+        <h4>Conteúdo</h4>
+        <a href="/blog">Blog</a>
+        <a href="/#portfolio">Portfólio</a>
+        <a href="/#depoimentos">Depoimentos</a>
+        <a href="/#contato">Contato</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; <span id="footerYear"></span> Makeup Camila Soares. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+  (function() {
+    document.getElementById('footerYear').textContent = new Date().getFullYear();
+
+    var catLabels = {
+      noiva:      { label: 'Noiva',      cls: 'cat-noiva' },
+      tendencias: { label: 'Tendências', cls: 'cat-tendencias' },
+      dicas:      { label: 'Dicas',      cls: 'cat-dicas' },
+      bastidores: { label: 'Bastidores', cls: 'cat-bastidores' }
+    };
+
+    function getPosts() {
+      try {
+        var cfg = JSON.parse(localStorage.getItem('camilaSiteConfig') || '{}');
+        return (cfg.blogPosts || []).filter(function(p) { return p.published; });
+      } catch(e) { return []; }
+    }
+
+    function formatDate(d) {
+      if (!d) return '';
+      var parts = d.split('-');
+      if (parts.length !== 3) return d;
+      return parts[2] + '/' + parts[1] + '/' + parts[0];
+    }
+
+    function renderPosts(cat) {
+      var posts = getPosts();
+      if (cat !== 'all') posts = posts.filter(function(p) { return p.category === cat; });
+      var grid = document.getElementById('blogGrid');
+      if (!posts.length) {
+        grid.innerHTML = '<div class="blog-empty"><i class="fas fa-pen-nib"></i><h3>Em breve</h3><p>Novos conteúdos chegando em breve. Fique ligada!</p></div>';
+        return;
+      }
+      grid.innerHTML = posts.map(function(p) {
+        var cat = catLabels[p.category] || { label: p.category, cls: '' };
+        var img = p.coverUrl
+          ? '<img class="blog-card-img" src="' + p.coverUrl + '" alt="' + p.title + '" loading="lazy" />'
+          : '<div class="blog-card-img-placeholder"><i class="fas fa-image"></i></div>';
+        return '<a href="/blog/' + p.slug + '" class="blog-card" style="text-decoration:none">'
+          + img
+          + '<div class="blog-card-body">'
+          + '<div class="blog-card-cat"><span class="cat-label ' + cat.cls + '">' + cat.label + '</span></div>'
+          + '<div class="blog-card-title">' + p.title + '</div>'
+          + '<div class="blog-card-excerpt">' + (p.excerpt || '') + '</div>'
+          + '<div class="blog-card-meta"><i class="fas fa-calendar-alt"></i> ' + formatDate(p.publishedAt) + '</div>'
+          + '<span class="blog-card-link">Ler mais <i class="fas fa-arrow-right"></i></span>'
+          + '</div></a>';
+      }).join('');
+    }
+
+    var currentCat = 'all';
+    renderPosts(currentCat);
+
+    document.getElementById('blogFilters').addEventListener('click', function(e) {
+      var btn = e.target.closest('.blog-filter-btn');
+      if (!btn) return;
+      document.querySelectorAll('.blog-filter-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      currentCat = btn.dataset.cat;
+      renderPosts(currentCat);
+    });
+  })();
+  </script>
+</body>
+</html>

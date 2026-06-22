@@ -41,6 +41,17 @@ document.addEventListener('click', e => {
   }
 });
 
+// ---------- PAGE VISIBILITY ----------
+(function() {
+  try {
+    var cfg = JSON.parse(localStorage.getItem('camilaSiteConfig') || '{}');
+    var pages = cfg.pages || {};
+    document.querySelectorAll('[data-page]').forEach(function(el) {
+      if (pages[el.dataset.page] === false) el.style.display = 'none';
+    });
+  } catch(e) {}
+})();
+
 // ---------- SCROLL ANIMATIONS ----------
 function checkAos() {
   const vh = window.innerHeight;
