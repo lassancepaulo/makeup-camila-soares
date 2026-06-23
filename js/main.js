@@ -39,7 +39,7 @@ document.querySelectorAll('.nav-has-dd').forEach(item => {
   });
   item.addEventListener('mouseleave', () => {
     if (window.innerWidth < 769) return;
-    closeTimer = setTimeout(() => item.classList.remove('open'), 300);
+    closeTimer = setTimeout(() => item.classList.remove('open'), 1000);
   });
 });
 
