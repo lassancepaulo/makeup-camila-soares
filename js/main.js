@@ -26,8 +26,27 @@ document.querySelectorAll('.nav-link:not(.nav-dd-toggle)').forEach(link => {
 });
 
 // Dropdown toggle
+// Dropdown toggle — desktop usa hover com delay, mobile usa click
+document.querySelectorAll('.nav-has-dd').forEach(item => {
+  let closeTimer;
+
+  // Desktop: abre no mouseenter, fecha com 300ms de delay no mouseleave
+  item.addEventListener('mouseenter', () => {
+    if (window.innerWidth < 769) return;
+    clearTimeout(closeTimer);
+    document.querySelectorAll('.nav-has-dd').forEach(el => { if (el !== item) el.classList.remove('open'); });
+    item.classList.add('open');
+  });
+  item.addEventListener('mouseleave', () => {
+    if (window.innerWidth < 769) return;
+    closeTimer = setTimeout(() => item.classList.remove('open'), 300);
+  });
+});
+
+// Mobile: abre/fecha no click
 document.querySelectorAll('.nav-dd-toggle').forEach(toggle => {
   toggle.addEventListener('click', e => {
+    if (window.innerWidth >= 769) return;
     e.preventDefault();
     const li = toggle.closest('.nav-has-dd');
     const wasOpen = li.classList.contains('open');

@@ -291,11 +291,9 @@ section { padding: 100px 0; }
   transition: background .15s, color .15s; white-space: nowrap;
 }
 .nav-chevron { font-size: .58rem; margin-left: 3px; transition: transform .2s; vertical-align: middle; }
-.nav-has-dd:hover .nav-chevron,
 .nav-has-dd.open .nav-chevron { transform: rotate(180deg); }
 @media (min-width: 769px) {
   .nav-dd {
-    /* Sempre no DOM; visibilidade controlada por opacity + pointer-events */
     display: block;
     position: absolute;
     top: calc(100% + 8px);
@@ -307,20 +305,15 @@ section { padding: 100px 0; }
     box-shadow: 0 10px 32px rgba(0,0,0,.14);
     padding: 6px 0;
     z-index: 300;
-    /* Estado oculto */
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    /* Delay só na SAÍDA (200ms), entrada imediata */
-    transition: opacity .15s ease, visibility .15s ease;
-    transition-delay: .2s;
+    transition: opacity .18s ease, visibility .18s ease;
   }
-  .nav-has-dd:hover .nav-dd,
   .nav-has-dd.open .nav-dd {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    transition-delay: 0s; /* aparece imediatamente */
   }
   .nav-dd-link { padding: 11px 18px; color: var(--text); }
   .nav-dd-link:hover { background: var(--cream-light); color: var(--rose-gold); }
